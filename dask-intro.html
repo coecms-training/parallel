@@ -52,6 +52,8 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Parallel Programming" href="README.html" />
@@ -177,6 +179,21 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-dask-arrays">
+   Creating Dask arrays
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
         </div>
     </div>
 </div>
@@ -263,6 +280,135 @@
 </div>
 </div>
 <p>Since I’ve only asked for a single element of the array, only that one chunk needs to be calculated. This is less important for this tiny example, but it does get important when you’ve got a huge dataset that you only need a subset of.</p>
+<div class="section" id="creating-dask-arrays">
+<h2>Creating Dask arrays<a class="headerlink" href="#creating-dask-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Something to keep in mind with Dask arrays is that you can’t directly write to an array element</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ERROR Item assignment with &lt;class &#39;tuple&#39;&gt; not supported
+</pre></div>
+</div>
+</div>
+</div>
+<p>This keeps us from trying to do calculations with loops, which Dask can’t parallelise and are really inefficient in Python. Instead you should use whole-array operations.</p>
+<p>Say we want to calculate the area of grid cells, knowing the latitude and longitude of grid point centres.</p>
+<p>For each grid point we need to calculate</p>
+<div class="math notranslate nohighlight">
+\[A = R^2\int_{\phi_0}^{\phi_1}\int_{\theta_0}^{\theta_1}\cos\theta d\theta d\phi = R^2(\phi_1 - \phi_0)(\cos \theta_1 - \cos \theta_0)\]</div>
+<p>Rather than doing this in a loop over each grid point, we can use numpy array operations, computing the width and height of each cell and then performing an outer vector product to create a 2d array</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">deg2rad</span>
+
+<span class="c1"># Grid centres</span>
+<span class="n">lon</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">lat</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># Grid spacing</span>
+<span class="n">dlon</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">lon</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="n">dlat</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+<span class="c1"># Grid edges in radians</span>
+<span class="n">lon0</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">dlon</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">lon1</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">lon</span> <span class="o">+</span> <span class="n">dlon</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">lat0</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">((</span><span class="n">lat</span> <span class="o">-</span> <span class="n">dlat</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">))</span>
+<span class="n">lat1</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">((</span><span class="n">lat</span> <span class="o">+</span> <span class="n">dlat</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">))</span>
+
+<span class="c1"># Compute cell dimensions</span>
+<span class="n">cell_width</span> <span class="o">=</span> <span class="n">lon1</span> <span class="o">-</span> <span class="n">lon0</span>
+<span class="n">cell_height</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat0</span><span class="p">)</span>
+
+<span class="c1"># Area</span>
+<span class="n">R_earth</span> <span class="o">=</span> <span class="mi">6_371_000</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">R_earth</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">cell_height</span><span class="p">,</span> <span class="n">cell_width</span><span class="p">)</span>
+<span class="n">A</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 1.20 MB </td> <td> 80.00 kB </td></tr>
+    <tr><th> Shape </th><td> (300, 500) </td> <td> (100, 100) </td></tr>
+    <tr><th> Count </th><td> 90 Tasks </td><td> 15 Chunks </td></tr>
+    <tr><th> Type </th><td> float64 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="170" height="122" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="0" y1="0" x2="120" y2="0" style="stroke-width:2" />
+  <line x1="0" y1="24" x2="120" y2="24" />
+  <line x1="0" y1="48" x2="120" y2="48" />
+  <line x1="0" y1="72" x2="120" y2="72" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="0" y1="0" x2="0" y2="72" style="stroke-width:2" />
+  <line x1="24" y1="0" x2="24" y2="72" />
+  <line x1="48" y1="0" x2="48" y2="72" />
+  <line x1="72" y1="0" x2="72" y2="72" />
+  <line x1="96" y1="0" x2="96" y2="72" />
+  <line x1="120" y1="0" x2="120" y2="72" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="0.0,0.0 120.0,0.0 120.0,72.0 0.0,72.0" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="60.000000" y="92.000000" font-size="1.0rem" font-weight="100" text-anchor="middle" >500</text>
+  <text x="140.000000" y="36.000000" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,140.000000,36.000000)">300</text>
+</svg>
+</td>
+</tr>
+</table></div></div>
+</div>
+<p>You can see that even though only numpy operations were used we still ended up with a Dask array at the end. An array much larger than would fit in memory can be created this way, with the values only needing to be computed if they’re actually used.</p>
+<p>Plotting Dask arrays works just like numpy arrays:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fb50d0719d0&gt;
+</pre></div>
+</div>
+<img alt="_images/dask-intro_11_1.png" src="_images/dask-intro_11_1.png" />
+</div>
+</div>
+<p>And we can check the total area is about <span class="math notranslate nohighlight">\(5.1 x 10^{14}\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;</span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;5.100645e+14&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
