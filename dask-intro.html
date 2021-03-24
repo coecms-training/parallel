@@ -237,7 +237,32 @@
 </table></div></div>
 </div>
 <p>Here I’ve made a 10x10 array, that’s made up of 4 5x5 chunks.</p>
-<p>Dask will run operations on different chunks in parallel</p>
+<p>Dask will run operations on different chunks in parallel. It evaluates arrays lazily - data is only computed for the chunks needed, if you don’t explicitly load the data (e.g. by using <code class="docutils literal notranslate"><span class="pre">.compute()</span></code>, or plotting or saving the data) it builds up a graph of operations that can be run later when the actual values are needed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/dask-intro_3_0.png" src="_images/dask-intro_3_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)[</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Since I’ve only asked for a single element of the array, only that one chunk needs to be calculated. This is less important for this tiny example, but it does get important when you’ve got a huge dataset that you only need a subset of.</p>
 </div>
 
     <script type="text/x-thebe-config">
