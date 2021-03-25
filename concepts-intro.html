@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Parallel Programming &#8212; Parallel Climate</title>
+    <title>Introduction &#8212; Parallel Climate</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -54,7 +54,8 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="concepts-intro.html" />
+    <link rel="next" title="Introduction" href="dask-intro.html" />
+    <link rel="prev" title="Parallel Programming" href="README.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -83,8 +84,8 @@
 </form>
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
     <ul class="nav sidenav_l1">
- <li class="toctree-l1 current active">
-  <a class="reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="README.html">
    Parallel Programming
   </a>
  </li>
@@ -94,9 +95,9 @@
   Concepts
  </span>
 </p>
-<ul class="nav sidenav_l1">
- <li class="toctree-l1">
-  <a class="reference internal" href="concepts-intro.html">
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    Introduction
   </a>
  </li>
@@ -157,9 +158,9 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/README.md"><button type="button"
+        <a class="dropdown-buttons" href="_sources/concepts-intro.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.md</button></a>
+                data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
@@ -177,11 +178,92 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/concepts-intro.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ahmdhal-s-law">
+   Ahmdhal’s Law
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#profiling">
+   Profiling
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#types-of-parallelism">
+   Types of parallelism
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#trivial">
+     Trivial
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vectorised-operators">
+     Vectorised operators
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#shared-memory">
+     Shared Memory
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#distributed">
+     Distributed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#common-gotchas">
+   Common Gotchas
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#race-conditions">
+     Race Conditions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#locks">
+     Locks
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
         </div>
     </div>
 </div>
@@ -190,12 +272,51 @@
         
               <div>
                 
-  <div class="section" id="parallel-programming">
-<h1>Parallel Programming<a class="headerlink" href="#parallel-programming" title="Permalink to this headline">¶</a></h1>
-<p>Collected notes on parallel programming in climate science</p>
-<div class="toctree-wrapper compound">
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ahmdhal-s-law">
+<h2>Ahmdhal’s Law<a class="headerlink" href="#ahmdhal-s-law" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="toctree-wrapper compound">
+<div class="section" id="profiling">
+<h2>Profiling<a class="headerlink" href="#profiling" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="types-of-parallelism">
+<h2>Types of parallelism<a class="headerlink" href="#types-of-parallelism" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="trivial">
+<h3>Trivial<a class="headerlink" href="#trivial" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="vectorised-operators">
+<h3>Vectorised operators<a class="headerlink" href="#vectorised-operators" title="Permalink to this headline">¶</a></h3>
+<p>Fortran:
+sse/avx intrinsics
+optimisation flags</p>
+<p>Python:
+numpy</p>
+</div>
+<div class="section" id="shared-memory">
+<h3>Shared Memory<a class="headerlink" href="#shared-memory" title="Permalink to this headline">¶</a></h3>
+<p>Fortran:
+openmp</p>
+<p>Python:
+Dask</p>
+</div>
+<div class="section" id="distributed">
+<h3>Distributed<a class="headerlink" href="#distributed" title="Permalink to this headline">¶</a></h3>
+<p>Fortran:
+MPI</p>
+<p>Python:
+Multiprocessing
+Dask Distributed</p>
+</div>
+</div>
+<div class="section" id="common-gotchas">
+<h2>Common Gotchas<a class="headerlink" href="#common-gotchas" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="race-conditions">
+<h3>Race Conditions<a class="headerlink" href="#race-conditions" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="locks">
+<h3>Locks<a class="headerlink" href="#locks" title="Permalink to this headline">¶</a></h3>
+</div>
 </div>
 </div>
 
@@ -208,23 +329,24 @@
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "conda-env-analysis3-py"
         },
         kernelOptions: {
-            kernelName: "python3",
+            kernelName: "conda-env-analysis3-py",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'conda-env-analysis3-py'</script>
 
               </div>
               
         
         <div class='prev-next-bottom'>
             
-    <a class='right-next' id="next-link" href="concepts-intro.html" title="next page">Introduction</a>
+    <a class='left-prev' id="prev-link" href="README.html" title="previous page">Parallel Programming</a>
+    <a class='right-next' id="next-link" href="dask-intro.html" title="next page">Introduction</a>
 
         </div>
         

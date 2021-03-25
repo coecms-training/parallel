@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Parallel Programming &#8212; Parallel Climate</title>
+    <title>Performance &#8212; Parallel Climate</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -54,7 +54,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="concepts-intro.html" />
+    <link rel="prev" title="Introduction" href="dask-intro.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -83,8 +83,8 @@
 </form>
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
     <ul class="nav sidenav_l1">
- <li class="toctree-l1 current active">
-  <a class="reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="README.html">
    Parallel Programming
   </a>
  </li>
@@ -106,14 +106,14 @@
   Dask
  </span>
 </p>
-<ul class="nav sidenav_l1">
+<ul class="current nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="dask-intro.html">
    Introduction
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="dask-performance.html">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    Performance
   </a>
  </li>
@@ -157,9 +157,9 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/README.md"><button type="button"
+        <a class="dropdown-buttons" href="_sources/dask-performance.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.md</button></a>
+                data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
@@ -177,11 +177,89 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/dask-performance.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cluster-size">
+   Cluster Size
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#distributed-dashboard">
+     Distributed Dashboard
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choice-of-chunking">
+   Choice of chunking
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#chunk-size">
+     Chunk size
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#chunk-shape">
+     Chunk shape
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#netcdf-file-chunking">
+     NetCDF file chunking
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#task-graph">
+   Task Graph
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#intermediate-save-loads">
+   Intermediate save &amp; loads
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#to-netcdf-throttled">
+     to_netcdf_throttled
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
         </div>
     </div>
 </div>
@@ -190,12 +268,34 @@
         
               <div>
                 
-  <div class="section" id="parallel-programming">
-<h1>Parallel Programming<a class="headerlink" href="#parallel-programming" title="Permalink to this headline">¶</a></h1>
-<p>Collected notes on parallel programming in climate science</p>
-<div class="toctree-wrapper compound">
+  <div class="section" id="performance">
+<h1>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cluster-size">
+<h2>Cluster Size<a class="headerlink" href="#cluster-size" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="distributed-dashboard">
+<h3>Distributed Dashboard<a class="headerlink" href="#distributed-dashboard" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="choice-of-chunking">
+<h2>Choice of chunking<a class="headerlink" href="#choice-of-chunking" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="chunk-size">
+<h3>Chunk size<a class="headerlink" href="#chunk-size" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="chunk-shape">
+<h3>Chunk shape<a class="headerlink" href="#chunk-shape" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="netcdf-file-chunking">
+<h3>NetCDF file chunking<a class="headerlink" href="#netcdf-file-chunking" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="task-graph">
+<h2>Task Graph<a class="headerlink" href="#task-graph" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="intermediate-save-loads">
+<h2>Intermediate save &amp; loads<a class="headerlink" href="#intermediate-save-loads" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="to-netcdf-throttled">
+<h3>to_netcdf_throttled<a class="headerlink" href="#to-netcdf-throttled" title="Permalink to this headline">¶</a></h3>
+</div>
 </div>
 </div>
 
@@ -208,23 +308,23 @@
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "conda-env-analysis3-py"
         },
         kernelOptions: {
-            kernelName: "python3",
+            kernelName: "conda-env-analysis3-py",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'conda-env-analysis3-py'</script>
 
               </div>
               
         
         <div class='prev-next-bottom'>
             
-    <a class='right-next' id="next-link" href="concepts-intro.html" title="next page">Introduction</a>
+    <a class='left-prev' id="prev-link" href="dask-intro.html" title="previous page">Introduction</a>
 
         </div>
         
