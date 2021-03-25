@@ -85,7 +85,7 @@
     <ul class="nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="README.html">
-   Parallel Programming
+   Introduction
   </a>
  </li>
 </ul>
@@ -248,10 +248,25 @@
   <a class="reference internal nav-link" href="#intermediate-save-loads">
    Intermediate save &amp; loads
   </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pathological-behaviour">
+   Pathological Behaviour
+  </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#to-netcdf-throttled">
-     to_netcdf_throttled
+    <a class="reference internal nav-link" href="#indexing-using-an-array">
+     Indexing using an array
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#climatologies-resampling">
+     Climatologies &amp; Resampling
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#lack-of-backpressure">
+     Lack of Backpressure
     </a>
    </li>
   </ul>
@@ -270,31 +285,81 @@
                 
   <div class="section" id="performance">
 <h1>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h1>
+<p>Getting Dask to perform well can be tricky. If you run into performance issues, whether with runtime or memory usage, break up your problem into stages and make sure each stage is working correctly before moving to the next.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These general recommendations are for performing reasonably straightforward operations on NetCDF files. Different types of analyses may show different behaviour, if in doubt profile!</p>
+</div>
 <div class="section" id="cluster-size">
 <h2>Cluster Size<a class="headerlink" href="#cluster-size" title="Permalink to this headline">¶</a></h2>
+<p>Generally your Dask cluster size should be kept reasonably small, say 8ish CPUs, if doing basic operations on NetCDF data. Due to Ahmdhal’s law more CPUs may not give you that much more performance. Profile your code by running it on a subset of the full dataset with different CPU counts.</p>
+<p>Prefer using processes (using <code class="docutils literal notranslate"><span class="pre">dask.distributed.Client</span></code>) to threads. Accessing a single NetCDF file within a single process is a serial operation - the NetCDF library locks the file, preventing more than one thread from reading the file. Different processes however can read from the same file fine (but not write to it).</p>
 <div class="section" id="distributed-dashboard">
 <h3>Distributed Dashboard<a class="headerlink" href="#distributed-dashboard" title="Permalink to this headline">¶</a></h3>
+<p>The dashboard that comes up when you start a cluster in Jupyter can give a lot of useful information.</p>
+<p>Is the memory use fairly stable, or does it keep increasing? Break up your problem to identify the operation that’s using all the memory, perhaps by using <a class="reference internal" href="#save-and-load"><span class="std std-ref">intermediate save &amp; loads</span></a>, or look at your <a class="reference internal" href="#chunking"><span class="std std-ref">initial chunking</span></a></p>
+<p>Is there a lot of red boxes in the timeline? That means Dask is spending a lot of time shuffling data around rather than doing useful work.</p>
+<p>Does it take ages for the dashboard to start showing anything running? Your <a class="reference internal" href="#task-graph"><span class="std std-ref">task graph</span></a> may have gotten too large.</p>
 </div>
 </div>
 <div class="section" id="choice-of-chunking">
-<h2>Choice of chunking<a class="headerlink" href="#choice-of-chunking" title="Permalink to this headline">¶</a></h2>
+<span id="chunking"></span><h2>Choice of chunking<a class="headerlink" href="#choice-of-chunking" title="Permalink to this headline">¶</a></h2>
+<p>The specific chunking you’re using can have a big effect on performance. Look at the chunking when you first open a dataset, this is what is most important for memory use. Note however that too small a chunk size can also create problems, by making too large a <a class="reference internal" href="#task-graph"><span class="std std-ref">task graph</span></a></p>
 <div class="section" id="chunk-size">
 <h3>Chunk size<a class="headerlink" href="#chunk-size" title="Permalink to this headline">¶</a></h3>
+<p>Aim for a chunk size that is a good bit less than the amount of memory available per CPU. On Gadi, there is 4 gb of memory per CPU on general purpose compute nodes, aim for a chunk size of less than 200 mb. This allows the computer to load multiple chunks at once and do useful work with them - if a single chunk is close to the memory limit then you can’t load more than one of them to say add them together.</p>
 </div>
 <div class="section" id="chunk-shape">
 <h3>Chunk shape<a class="headerlink" href="#chunk-shape" title="Permalink to this headline">¶</a></h3>
+<p>If you’re going to be filtering out data - say selecting a single level or timestep, then aim for a chunking that will make that easy to do - use a low chunk size in that dimension.</p>
+<p>Generally, files are laid out so that nearby grid points are close to each other in a file, and consecutive time points are further away from each other. Loading nearby points from a file is faster, so aim to have a larger horizontal chunk size and a smaller time chunk size.</p>
 </div>
 <div class="section" id="netcdf-file-chunking">
 <h3>NetCDF file chunking<a class="headerlink" href="#netcdf-file-chunking" title="Permalink to this headline">¶</a></h3>
+<p>NetCDF files can contain their own chunks, this is used for compression and faster data access. In this case loading data within the same chunk is faster so aim for your Dask chunk size to be some multiple of the NetCDF chunk size.</p>
 </div>
 </div>
 <div class="section" id="task-graph">
-<h2>Task Graph<a class="headerlink" href="#task-graph" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Task Graph<a class="headerlink" href="#task-graph" title="Permalink to this headline">¶</a></h2>
+<p>As you built up operations on your data, or if you have a great number of <a class="reference internal" href="#chunking"><span class="std std-ref">small chunks</span></a> the size of Dask’s task graph can become difficult for it to manage. Normally this manifests as Dask taking a long time to start running once you execute a Jupyter cell.</p>
 </div>
 <div class="section" id="intermediate-save-loads">
-<h2>Intermediate save &amp; loads<a class="headerlink" href="#intermediate-save-loads" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="to-netcdf-throttled">
-<h3>to_netcdf_throttled<a class="headerlink" href="#to-netcdf-throttled" title="Permalink to this headline">¶</a></h3>
+<span id="save-and-load"></span><h2>Intermediate save &amp; loads<a class="headerlink" href="#intermediate-save-loads" title="Permalink to this headline">¶</a></h2>
+<p>To cut down on the graph size it can be helpful to reset everything by saving your current progress to a file and then re-opening it. This can also be helpful if you’re going to loop over one of the dimensions (say to makean animated plot over time) - otherwise Dask can end up re-calculating everything on every loop iteration.</p>
+<p>Nothing tricky here - just mind file sizes and clean up the temporary file when you’re done</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="s1">&#39;tmp.nc&#39;</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;tmp.nc&#39;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">{</span><span class="o">...</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pathological-behaviour">
+<h2>Pathological Behaviour<a class="headerlink" href="#pathological-behaviour" title="Permalink to this headline">¶</a></h2>
+<p>Some Dask operations can show really poor performance. Here are some workarounds that we have found</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This behaviour may not apply to all versions of Dask, it’s mostly to highlight areas where we’ve seen problems</p>
+</div>
+<div class="section" id="indexing-using-an-array">
+<h3>Indexing using an array<a class="headerlink" href="#indexing-using-an-array" title="Permalink to this headline">¶</a></h3>
+<p>Using an array of indices to index a Dask array can make Dask load the entire thing</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Return only the values at 0000Z</span>
+<span class="n">indices</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span>  <span class="mi">0</span>
+
+<span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+<p>Instead try <code class="docutils literal notranslate"><span class="pre">.where(...,</span> <span class="pre">drop=True)</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="climatologies-resampling">
+<h3>Climatologies &amp; Resampling<a class="headerlink" href="#climatologies-resampling" title="Permalink to this headline">¶</a></h3>
+<p>The default Xarray climatology and resample operations create a large number of chunks - one for each sample period.</p>
+</div>
+<div class="section" id="lack-of-backpressure">
+<h3>Lack of Backpressure<a class="headerlink" href="#lack-of-backpressure" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>

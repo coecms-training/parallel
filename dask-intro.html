@@ -88,7 +88,7 @@
     <ul class="nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="README.html">
-   Parallel Programming
+   Introduction
   </a>
  </li>
 </ul>
@@ -1461,6 +1461,92 @@ Attributes:
 </div>
 <div class="section" id="distributed-dask">
 <h2>Distributed Dask<a class="headerlink" href="#distributed-dask" title="Permalink to this headline">¶</a></h2>
+<p>Without any special setup, Dask will run operations in threaded mode. You can configure it to run in distributed mode instead with</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dask.distributed</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">client</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">dask_worker_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+    
+    <span class="n">client</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span>
+        <span class="n">local_directory</span> <span class="o">=</span> <span class="n">dask_worker_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">client</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+</pre></div>
+</div>
+<div class="output text_html"><table style="border: 2px solid white;">
+<tr>
+<td style="vertical-align: top; border: 0px solid white">
+<h3 style="text-align: left;">Client</h3>
+<ul style="text-align: left; list-style: none; margin: 0; padding: 0;">
+  <li><b>Scheduler: </b>tcp://127.0.0.1:49701</li>
+  <li><b>Dashboard: </b><a href='http://127.0.0.1:8787/status' target='_blank'>http://127.0.0.1:8787/status</a></li>
+</ul>
+</td>
+<td style="vertical-align: top; border: 0px solid white">
+<h3 style="text-align: left;">Cluster</h3>
+<ul style="text-align: left; list-style:none; margin: 0; padding: 0;">
+  <li><b>Workers: </b>4</li>
+  <li><b>Cores: </b>12</li>
+  <li><b>Memory: </b>17.13 GB</li>
+</ul>
+</td>
+</tr>
+</table></div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+distributed.comm.tcp - WARNING - Could not set timeout on TCP stream: [Errno 92] Protocol not available
+</pre></div>
+</div>
+</div>
+</div>
+<p>This will by default ask for all resources available on your computer.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">try:</span> <span class="pre">...</span> <span class="pre">except</span> <span class="pre">NameError:</span></code> structure is to make sure only on Dask client is created, in case you execute the notebook cell more than once. If you’re writing a python script rather than using a notebook it’s not needed.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It’s important to set the <code class="docutils literal notranslate"><span class="pre">local_directory</span></code> parameter, otherwise Dask will store temporary files in the current working directory which can be a problem if filesystem quotas are enabled.</p>
+</div>
+<p>Other useful options are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_workers</span></code>: Number of distributed processes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">threads_per_worker</span></code>: Number of shared memory threads within each process</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memory_limit</span></code>: Memory available to each process (e.g. <code class="docutils literal notranslate"><span class="pre">'4gb'</span></code>)</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you’re using a shared system, be polite and don’t take over the whole system with your Dask cluster, set reasonable limits. If running on NCI’s Gadi supercomputer, <code class="docutils literal notranslate"><span class="pre">climtas.nci.GadiClient()</span></code> will inspect the PBS resources requested by <code class="docutils literal notranslate"><span class="pre">qsub</span></code> and set up the cluster using those limits</p>
+</div>
+<p>You can follow the dashboard link displayed by Jupyter to get an interactive view of what the Dask cluster is doing.</p>
+<p>To stop the Dask cluster run</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This isn’t normally needed, Dask will clean itself up at the end of your script automatically, but it can be helpful if you’re experimenting with different cluster sizes.</p>
 </div>
 </div>
 
