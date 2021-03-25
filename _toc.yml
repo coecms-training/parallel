@@ -1,2 +1,8 @@
 - file: README
-- file: dask-intro
+- part: Concepts
+  chapters:
+    - file: concepts-intro
+- part: Dask
+  chapters:
+    - file: dask-intro
+    - file: dask-performance
