@@ -307,6 +307,9 @@
 <h2>Cluster Size<a class="headerlink" href="#cluster-size" title="Permalink to this headline">¶</a></h2>
 <p>Generally your Dask cluster size should be kept reasonably small, say 8ish CPUs, if doing basic operations on NetCDF data. Due to Ahmdhal’s law more CPUs may not give you that much more performance. Profile your code by running it on a subset of the full dataset with different CPU counts.</p>
 <p>Prefer using processes (using <code class="docutils literal notranslate"><span class="pre">dask.distributed.Client</span></code>) to threads. Accessing a single NetCDF file within a single process is a serial operation - the NetCDF library locks the file, preventing more than one thread from reading the file. Different processes however can read from the same file fine (but not write to it).</p>
+<div class="highlight-{admonition}TODO notranslate"><div class="highlight"><pre><span></span>Graph of scaling with different cluster / thread sizes
+</pre></div>
+</div>
 <div class="section" id="distributed-dashboard">
 <h3>Distributed Dashboard<a class="headerlink" href="#distributed-dashboard" title="Permalink to this headline">¶</a></h3>
 <p>The dashboard that comes up when you start a cluster in Jupyter can give a lot of useful information.</p>
@@ -370,9 +373,344 @@
 <div class="section" id="climatologies-resampling">
 <h3>Climatologies &amp; Resampling<a class="headerlink" href="#climatologies-resampling" title="Permalink to this headline">¶</a></h3>
 <p>The default Xarray climatology and resample operations create a large number of chunks - one for each sample period.</p>
+<p>Say we want to resample hourly ERA5 data to daily</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xarray</span>
+
+<span class="n">msl</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/msl/2010/*.nc&#39;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">})</span><span class="o">.</span><span class="n">msl</span>
+<span class="n">msl</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 36.38 GB </td> <td> 267.84 MB </td></tr>
+    <tr><th> Shape </th><td> (8760, 721, 1440) </td> <td> (744, 300, 300) </td></tr>
+    <tr><th> Count </th><td> 372 Tasks </td><td> 180 Chunks </td></tr>
+    <tr><th> Type </th><td> float32 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="171" height="158" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="10" y1="15" x2="80" y2="86" />
+  <line x1="10" y1="31" x2="80" y2="101" />
+  <line x1="10" y1="37" x2="80" y2="108" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="10" y2="37" style="stroke-width:2" />
+  <line x1="15" y1="5" x2="15" y2="43" />
+  <line x1="21" y1="11" x2="21" y2="48" />
+  <line x1="27" y1="17" x2="27" y2="54" />
+  <line x1="33" y1="23" x2="33" y2="60" />
+  <line x1="39" y1="29" x2="39" y2="66" />
+  <line x1="45" y1="35" x2="45" y2="72" />
+  <line x1="50" y1="40" x2="50" y2="78" />
+  <line x1="56" y1="46" x2="56" y2="84" />
+  <line x1="62" y1="52" x2="62" y2="90" />
+  <line x1="68" y1="58" x2="68" y2="96" />
+  <line x1="74" y1="64" x2="74" y2="102" />
+  <line x1="80" y1="70" x2="80" y2="108" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 80.58823529411765,70.58823529411765 80.58823529411765,108.07999437241787 10.0,37.49175907830022" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="51" y2="0" style="stroke-width:2" />
+  <line x1="15" y1="5" x2="57" y2="5" />
+  <line x1="21" y1="11" x2="62" y2="11" />
+  <line x1="27" y1="17" x2="68" y2="17" />
+  <line x1="33" y1="23" x2="74" y2="23" />
+  <line x1="39" y1="29" x2="80" y2="29" />
+  <line x1="45" y1="35" x2="86" y2="35" />
+  <line x1="50" y1="40" x2="92" y2="40" />
+  <line x1="56" y1="46" x2="98" y2="46" />
+  <line x1="62" y1="52" x2="103" y2="52" />
+  <line x1="68" y1="58" x2="109" y2="58" />
+  <line x1="74" y1="64" x2="115" y2="64" />
+  <line x1="80" y1="70" x2="121" y2="70" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="18" y1="0" x2="89" y2="70" />
+  <line x1="27" y1="0" x2="97" y2="70" />
+  <line x1="35" y1="0" x2="106" y2="70" />
+  <line x1="44" y1="0" x2="114" y2="70" />
+  <line x1="51" y1="0" x2="121" y2="70" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 51.13999720598501,0.0 121.72823250010266,70.58823529411765 80.58823529411765,70.58823529411765" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="80" y1="70" x2="121" y2="70" style="stroke-width:2" />
+  <line x1="80" y1="86" x2="121" y2="86" />
+  <line x1="80" y1="101" x2="121" y2="101" />
+  <line x1="80" y1="108" x2="121" y2="108" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="80" y1="70" x2="80" y2="108" style="stroke-width:2" />
+  <line x1="89" y1="70" x2="89" y2="108" />
+  <line x1="97" y1="70" x2="97" y2="108" />
+  <line x1="106" y1="70" x2="106" y2="108" />
+  <line x1="114" y1="70" x2="114" y2="108" />
+  <line x1="121" y1="70" x2="121" y2="108" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="80.58823529411765,70.58823529411765 121.72823250010266,70.58823529411765 121.72823250010266,108.07999437241787 80.58823529411765,108.07999437241787" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="101.158234" y="128.079994" font-size="1.0rem" font-weight="100" text-anchor="middle" >1440</text>
+  <text x="141.728233" y="89.334115" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,141.728233,89.334115)">721</text>
+  <text x="35.294118" y="92.785877" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,35.294118,92.785877)">8760</text>
+</svg>
+</td>
+</tr>
+</table></div></div>
+</div>
+<p>The source data has a reasonable chunk size - a month in time, and 300x300 horizontally, with a total of 180 chunks in the whole dataset.</p>
+<p>Using the default Xarray resample increases the number of chunks dramatically</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">msl_daily</span> <span class="o">=</span> <span class="n">msl</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;1D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">msl_daily</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 1.52 GB </td> <td> 360.00 kB </td></tr>
+    <tr><th> Shape </th><td> (365, 721, 1440) </td> <td> (1, 300, 300) </td></tr>
+    <tr><th> Count </th><td> 22272 Tasks </td><td> 5475 Chunks </td></tr>
+    <tr><th> Type </th><td> float32 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="205" height="135" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="35" y2="25" style="stroke-width:2" />
+  <line x1="10" y1="25" x2="35" y2="50" />
+  <line x1="10" y1="50" x2="35" y2="75" />
+  <line x1="10" y1="60" x2="35" y2="85" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="10" y2="60" style="stroke-width:2" />
+  <line x1="11" y1="1" x2="11" y2="61" />
+  <line x1="12" y1="2" x2="12" y2="62" />
+  <line x1="13" y1="3" x2="13" y2="64" />
+  <line x1="15" y1="5" x2="15" y2="65" />
+  <line x1="16" y1="6" x2="16" y2="66" />
+  <line x1="17" y1="7" x2="17" y2="68" />
+  <line x1="19" y1="9" x2="19" y2="69" />
+  <line x1="20" y1="10" x2="20" y2="70" />
+  <line x1="21" y1="11" x2="21" y2="71" />
+  <line x1="23" y1="13" x2="23" y2="73" />
+  <line x1="24" y1="14" x2="24" y2="74" />
+  <line x1="25" y1="15" x2="25" y2="76" />
+  <line x1="27" y1="17" x2="27" y2="77" />
+  <line x1="28" y1="18" x2="28" y2="78" />
+  <line x1="29" y1="19" x2="29" y2="80" />
+  <line x1="31" y1="21" x2="31" y2="81" />
+  <line x1="32" y1="22" x2="32" y2="82" />
+  <line x1="33" y1="23" x2="33" y2="83" />
+  <line x1="35" y1="25" x2="35" y2="85" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 35.26481292860946,25.26481292860946 35.26481292860946,85.34814626194279 10.0,60.083333333333336" style="fill:#8B4903A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2" />
+  <line x1="11" y1="1" x2="131" y2="1" />
+  <line x1="12" y1="2" x2="132" y2="2" />
+  <line x1="13" y1="3" x2="133" y2="3" />
+  <line x1="15" y1="5" x2="135" y2="5" />
+  <line x1="16" y1="6" x2="136" y2="6" />
+  <line x1="17" y1="7" x2="137" y2="7" />
+  <line x1="19" y1="9" x2="139" y2="9" />
+  <line x1="20" y1="10" x2="140" y2="10" />
+  <line x1="21" y1="11" x2="141" y2="11" />
+  <line x1="23" y1="13" x2="143" y2="13" />
+  <line x1="24" y1="14" x2="144" y2="14" />
+  <line x1="25" y1="15" x2="145" y2="15" />
+  <line x1="27" y1="17" x2="147" y2="17" />
+  <line x1="28" y1="18" x2="148" y2="18" />
+  <line x1="29" y1="19" x2="149" y2="19" />
+  <line x1="31" y1="21" x2="151" y2="21" />
+  <line x1="32" y1="22" x2="152" y2="22" />
+  <line x1="33" y1="23" x2="153" y2="23" />
+  <line x1="35" y1="25" x2="155" y2="25" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="35" y2="25" style="stroke-width:2" />
+  <line x1="35" y1="0" x2="60" y2="25" />
+  <line x1="60" y1="0" x2="85" y2="25" />
+  <line x1="85" y1="0" x2="110" y2="25" />
+  <line x1="110" y1="0" x2="135" y2="25" />
+  <line x1="130" y1="0" x2="155" y2="25" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 130.0,0.0 155.26481292860944,25.26481292860946 35.26481292860946,25.26481292860946" style="fill:#8B4903A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="35" y1="25" x2="155" y2="25" style="stroke-width:2" />
+  <line x1="35" y1="50" x2="155" y2="50" />
+  <line x1="35" y1="75" x2="155" y2="75" />
+  <line x1="35" y1="85" x2="155" y2="85" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="35" y1="25" x2="35" y2="85" style="stroke-width:2" />
+  <line x1="60" y1="25" x2="60" y2="85" />
+  <line x1="85" y1="25" x2="85" y2="85" />
+  <line x1="110" y1="25" x2="110" y2="85" />
+  <line x1="135" y1="25" x2="135" y2="85" />
+  <line x1="155" y1="25" x2="155" y2="85" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="35.26481292860946,25.26481292860946 155.26481292860944,25.26481292860946 155.26481292860944,85.34814626194279 35.26481292860946,85.34814626194279" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="95.264813" y="105.348146" font-size="1.0rem" font-weight="100" text-anchor="middle" >1440</text>
+  <text x="175.264813" y="55.306480" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,175.264813,55.306480)">721</text>
+  <text x="12.632406" y="92.715740" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,12.632406,92.715740)">365</text>
+</svg>
+</td>
+</tr>
+</table></div></div>
+</div>
+<p>The number of chunks has increased by 30x, and the task graph size by 60x. Rather than one chunk per month, now the time chunking is once per day.</p>
+<p>This increase in chunk count is neccessary if your data’s time axis is irregularly spaced, but if you have regular data it’s possible to optimise the resampling using array reshaping operations without changing the number of chunks.</p>
+<p>The <a class="reference external" href="https://climtas.readthedocs.io">climtas</a> library has implementations of resample and groupby that implement these optimisations, keeping the number of chunks the same and not significantly increasing the task graph size.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climtas</span>
+
+<span class="n">msl_daily</span> <span class="o">=</span> <span class="n">climtas</span><span class="o">.</span><span class="n">blocked_resample</span><span class="p">(</span><span class="n">msl</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">msl_daily</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 1.52 GB </td> <td> 11.16 MB </td></tr>
+    <tr><th> Shape </th><td> (365, 721, 1440) </td> <td> (31, 300, 300) </td></tr>
+    <tr><th> Count </th><td> 552 Tasks </td><td> 180 Chunks </td></tr>
+    <tr><th> Type </th><td> float32 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="205" height="135" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="35" y2="25" style="stroke-width:2" />
+  <line x1="10" y1="25" x2="35" y2="50" />
+  <line x1="10" y1="50" x2="35" y2="75" />
+  <line x1="10" y1="60" x2="35" y2="85" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="10" y2="60" style="stroke-width:2" />
+  <line x1="12" y1="2" x2="12" y2="62" />
+  <line x1="14" y1="4" x2="14" y2="64" />
+  <line x1="16" y1="6" x2="16" y2="66" />
+  <line x1="18" y1="8" x2="18" y2="68" />
+  <line x1="20" y1="10" x2="20" y2="70" />
+  <line x1="22" y1="12" x2="22" y2="72" />
+  <line x1="24" y1="14" x2="24" y2="74" />
+  <line x1="26" y1="16" x2="26" y2="76" />
+  <line x1="28" y1="18" x2="28" y2="78" />
+  <line x1="31" y1="21" x2="31" y2="81" />
+  <line x1="33" y1="23" x2="33" y2="83" />
+  <line x1="35" y1="25" x2="35" y2="85" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 35.26481292860946,25.26481292860946 35.26481292860946,85.34814626194279 10.0,60.083333333333336" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2" />
+  <line x1="12" y1="2" x2="132" y2="2" />
+  <line x1="14" y1="4" x2="134" y2="4" />
+  <line x1="16" y1="6" x2="136" y2="6" />
+  <line x1="18" y1="8" x2="138" y2="8" />
+  <line x1="20" y1="10" x2="140" y2="10" />
+  <line x1="22" y1="12" x2="142" y2="12" />
+  <line x1="24" y1="14" x2="144" y2="14" />
+  <line x1="26" y1="16" x2="146" y2="16" />
+  <line x1="28" y1="18" x2="148" y2="18" />
+  <line x1="31" y1="21" x2="151" y2="21" />
+  <line x1="33" y1="23" x2="153" y2="23" />
+  <line x1="35" y1="25" x2="155" y2="25" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="35" y2="25" style="stroke-width:2" />
+  <line x1="35" y1="0" x2="60" y2="25" />
+  <line x1="60" y1="0" x2="85" y2="25" />
+  <line x1="85" y1="0" x2="110" y2="25" />
+  <line x1="110" y1="0" x2="135" y2="25" />
+  <line x1="130" y1="0" x2="155" y2="25" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 130.0,0.0 155.26481292860944,25.26481292860946 35.26481292860946,25.26481292860946" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="35" y1="25" x2="155" y2="25" style="stroke-width:2" />
+  <line x1="35" y1="50" x2="155" y2="50" />
+  <line x1="35" y1="75" x2="155" y2="75" />
+  <line x1="35" y1="85" x2="155" y2="85" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="35" y1="25" x2="35" y2="85" style="stroke-width:2" />
+  <line x1="60" y1="25" x2="60" y2="85" />
+  <line x1="85" y1="25" x2="85" y2="85" />
+  <line x1="110" y1="25" x2="110" y2="85" />
+  <line x1="135" y1="25" x2="135" y2="85" />
+  <line x1="155" y1="25" x2="155" y2="85" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="35.26481292860946,25.26481292860946 155.26481292860944,25.26481292860946 155.26481292860944,85.34814626194279 35.26481292860946,85.34814626194279" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="95.264813" y="105.348146" font-size="1.0rem" font-weight="100" text-anchor="middle" >1440</text>
+  <text x="175.264813" y="55.306480" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,175.264813,55.306480)">721</text>
+  <text x="12.632406" y="92.715740" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,12.632406,92.715740)">365</text>
+</svg>
+</td>
+</tr>
+</table></div></div>
+</div>
 </div>
 <div class="section" id="lack-of-backpressure">
 <h3>Lack of Backpressure<a class="headerlink" href="#lack-of-backpressure" title="Permalink to this headline">¶</a></h3>
+<p>The Dask task graph doesn’t currently keep track of how much memory an operation will use. This means that Dask can try to start processing lots of chunks, but then as it goes down the graph it stalls as there isn’t enough memory available to perform the next set of operations.</p>
+<p>The ideal way to solve this is to use a concept called ‘back pressure’ - the rate that new chunks start being processed is limited to make sure that there’s enough memory available to finish processing them. Dask doesn’t currently support this, as a work around the Climtas library has a function that will save a Dataset to file a few chunks at a time manually rate limiting the number of active chunks being processed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">climtas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">to_netcdf_throttled</span><span class="p">(</span><span class="n">msl_daily</span><span class="p">,</span> <span class="s1">&#39;era5_msl_daily.nc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -386,16 +724,16 @@
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "conda-env-analysis3-py"
+            mode: "conda-env-analysis3-21.01-py"
         },
         kernelOptions: {
-            kernelName: "conda-env-analysis3-py",
+            kernelName: "conda-env-analysis3-21.01-py",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'conda-env-analysis3-py'</script>
+    <script>kernelName = 'conda-env-analysis3-21.01-py'</script>
 
               </div>
               
