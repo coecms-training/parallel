@@ -369,6 +369,12 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Or alternatively, make sure the index array has the same chunking as the source data</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isifinite</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Computed from &#39;data&#39;, so has the same chunks</span>
+
+<span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="climatologies-resampling">
 <h3>Climatologies &amp; Resampling<a class="headerlink" href="#climatologies-resampling" title="Permalink to this headline">¶</a></h3>
