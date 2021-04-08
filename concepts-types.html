@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Introduction &#8212; Parallel Programming in Climate and Weather</title>
+    <title>Types of parallelism &#8212; Parallel Programming in Climate and Weather</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -54,7 +54,8 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="concepts-intro.html" />
+    <link rel="next" title="Introduction" href="dask-intro.html" />
+    <link rel="prev" title="Introduction" href="concepts-intro.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -83,8 +84,8 @@
 </form>
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
     <ul class="nav sidenav_l1">
- <li class="toctree-l1 current active">
-  <a class="reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="README.html">
    Introduction
   </a>
  </li>
@@ -94,24 +95,24 @@
   Concepts
  </span>
 </p>
-<ul class="nav sidenav_l1">
+<ul class="current nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="concepts-intro.html">
    Introduction
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="concepts-types.html">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    Types of parallelism
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="concepts-types.html#design-patterns">
+  <a class="reference internal" href="#design-patterns">
    Design Patterns
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="concepts-types.html#common-gotchas">
+  <a class="reference internal" href="#common-gotchas">
    Common Gotchas
   </a>
  </li>
@@ -172,9 +173,9 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/README.md"><button type="button"
+        <a class="dropdown-buttons" href="_sources/concepts-types.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.md</button></a>
+                data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
@@ -205,6 +206,23 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/coecms-training/parallel/master?urlpath=tree/concepts-types.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
@@ -216,11 +234,53 @@
         </div>
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#contributing">
-   Contributing
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Types of parallelism
   </a>
   <ul class="nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#embarissingly-parallel">
+     Embarissingly Parallel
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vectorised-operators">
+     Vectorised operators
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#shared-memory">
+     Shared Memory
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#distributed">
+     Distributed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#design-patterns">
+   Design Patterns
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#common-gotchas">
+   Common Gotchas
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#race-conditions">
+     Race Conditions
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#locks">
+     Locks
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -235,18 +295,45 @@
         
               <div>
                 
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Parallel programming is an essential part of producing and analysing large scale datasets in the Climate and Weather space.</p>
-<p>This website contains collected notes on parallel programming in climate science, by the ARC Centre for Excellence in Climate Extremes’ Computational Modelling Systems Team (CLEX CMS). The primary focus of this work is data analysis using Python on gridded datasets, but we will also somewhat cover how parallel programming is used in climate and weather modelling using Fortran.</p>
-<p>We aim for the notebooks here to be executable using Binder (the rocket button in the top left of pages) using publically available data, however especially for large dataset demonstrations we may use files stored at <a class="reference external" href="https://nci.org.au">NCI</a>. Those with NCI accounts can start a Jupyter session on VDI or Gadi using the scripts at <a class="reference external" href="https://github.com/coecms/nci_scripts">https://github.com/coecms/nci_scripts</a>.</p>
-<div class="section" id="contributing">
-<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
-<p>The source code for this website is stored at <a class="reference external" href="https://github.com/coecms-training/parallel">https://github.com/coecms-training/parallel</a>. It is produced using <a class="reference external" href="https://jupyterbook.org/intro.html">Jupyter Book</a>.</p>
-<div class="toctree-wrapper compound">
+  <div class="section" id="types-of-parallelism">
+<h1>Types of parallelism<a class="headerlink" href="#types-of-parallelism" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="embarissingly-parallel">
+<h2>Embarissingly Parallel<a class="headerlink" href="#embarissingly-parallel" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="toctree-wrapper compound">
+<div class="section" id="vectorised-operators">
+<h2>Vectorised operators<a class="headerlink" href="#vectorised-operators" title="Permalink to this headline">¶</a></h2>
+<p>Fortran:
+sse/avx intrinsics
+optimisation flags</p>
+<p>Python:
+numpy</p>
 </div>
+<div class="section" id="shared-memory">
+<h2>Shared Memory<a class="headerlink" href="#shared-memory" title="Permalink to this headline">¶</a></h2>
+<p>Fortran:
+openmp</p>
+<p>Python:
+Dask</p>
+</div>
+<div class="section" id="distributed">
+<h2>Distributed<a class="headerlink" href="#distributed" title="Permalink to this headline">¶</a></h2>
+<p>Fortran:
+MPI</p>
+<p>Python:
+Multiprocessing
+Dask Distributed</p>
+</div>
+</div>
+<div class="section" id="design-patterns">
+<h1>Design Patterns<a class="headerlink" href="#design-patterns" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="common-gotchas">
+<h1>Common Gotchas<a class="headerlink" href="#common-gotchas" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="race-conditions">
+<h2>Race Conditions<a class="headerlink" href="#race-conditions" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="locks">
+<h2>Locks<a class="headerlink" href="#locks" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -259,23 +346,24 @@
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "conda-env-analysis3-py"
         },
         kernelOptions: {
-            kernelName: "python3",
+            kernelName: "conda-env-analysis3-py",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'conda-env-analysis3-py'</script>
 
               </div>
               
         
         <div class='prev-next-bottom'>
             
-    <a class='right-next' id="next-link" href="concepts-intro.html" title="next page">Introduction</a>
+    <a class='left-prev' id="prev-link" href="concepts-intro.html" title="previous page">Introduction</a>
+    <a class='right-next' id="next-link" href="dask-intro.html" title="next page">Introduction</a>
 
         </div>
         

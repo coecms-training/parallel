@@ -100,6 +100,21 @@
    Introduction
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html">
+   Types of parallelism
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html#design-patterns">
+   Design Patterns
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html#common-gotchas">
+   Common Gotchas
+  </a>
+ </li>
 </ul>
 <p class="caption collapsible-parent">
  <span class="caption-text">
@@ -263,8 +278,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#pathological-behaviour">
-   Pathological Behaviour
+  <a class="reference internal nav-link" href="#pathological-behaviour-and-troubleshooting">
+   Pathological Behaviour and Troubleshooting
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -280,6 +295,11 @@
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#lack-of-backpressure">
      Lack of Backpressure
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#kernel-dying-out-of-memory">
+     Kernel Dying / Out of Memory
     </a>
    </li>
   </ul>
@@ -310,6 +330,7 @@
 <div class="highlight-{admonition}TODO notranslate"><div class="highlight"><pre><span></span>Graph of scaling with different cluster / thread sizes
 </pre></div>
 </div>
+<p>(distributed dashboard)=</p>
 <div class="section" id="distributed-dashboard">
 <h3>Distributed Dashboard<a class="headerlink" href="#distributed-dashboard" title="Permalink to this headline">¶</a></h3>
 <p>The dashboard that comes up when you start a cluster in Jupyter can give a lot of useful information.</p>
@@ -349,8 +370,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="pathological-behaviour">
-<h2>Pathological Behaviour<a class="headerlink" href="#pathological-behaviour" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pathological-behaviour-and-troubleshooting">
+<h2>Pathological Behaviour and Troubleshooting<a class="headerlink" href="#pathological-behaviour-and-troubleshooting" title="Permalink to this headline">¶</a></h2>
 <p>Some Dask operations can show really poor performance. Here are some workarounds that we have found</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -718,6 +739,110 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="kernel-dying-out-of-memory">
+<h3>Kernel Dying / Out of Memory<a class="headerlink" href="#kernel-dying-out-of-memory" title="Permalink to this headline">¶</a></h3>
+<p>The Jupyter kernel dying can be identified either as an explicit error message that pops up, or when you try to execute a cell and the number goes back to ‘[1]’</p>
+<p>The most likely cause of the kernel dying is running out of memory. This can either be from Dask loading too much, keeping a lot of arrays around, or from external libraries like netCDF needing extra memory.</p>
+<p>To see if Dask is loading too much memory, check the memory graph in the [Distributed Dashboard](distributed dashboard), and make sure your cluster’s memory limit matches the resources you have available. Dask will restart a worker if its memory goes over 90% or so of its limit.</p>
+<p>If you use Numpy arrays to hold intermediate data, then it’s possible for the size of these arrays to add up to quite a lot, especially if they’re multi-dimensional. You can get the size of an array in bytes with <code class="docutils literal notranslate"><span class="pre">.nbytes</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
+<span class="n">x</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">/</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.52587890625
+</pre></div>
+</div>
+</div>
+</div>
+<p>or by converting to a dask array and checking the dask printout:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dask.array</span>
+
+<span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 1.60 MB </td> <td> 1.60 MB </td></tr>
+    <tr><th> Shape </th><td> (100, 100, 20) </td> <td> (100, 100, 20) </td></tr>
+    <tr><th> Count </th><td> 1 Tasks </td><td> 1 Chunks </td></tr>
+    <tr><th> Type </th><td> float64 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="172" height="240" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="10" y1="120" x2="80" y2="190" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="10" y2="120" style="stroke-width:2" />
+  <line x1="80" y1="70" x2="80" y2="190" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 80.58823529411765,70.58823529411765 80.58823529411765,190.58823529411765 10.0,120.0" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="52" y2="0" style="stroke-width:2" />
+  <line x1="80" y1="70" x2="122" y2="70" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="52" y1="0" x2="122" y2="70" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 52.00989029700999,0.0 122.59812559112764,70.58823529411765 80.58823529411765,70.58823529411765" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="80" y1="70" x2="122" y2="70" style="stroke-width:2" />
+  <line x1="80" y1="190" x2="122" y2="190" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="80" y1="70" x2="80" y2="190" style="stroke-width:2" />
+  <line x1="122" y1="70" x2="122" y2="190" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="80.58823529411765,70.58823529411765 122.59812559112764,70.58823529411765 122.59812559112764,190.58823529411765 80.58823529411765,190.58823529411765" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="101.593180" y="210.588235" font-size="1.0rem" font-weight="100" text-anchor="middle" >20</text>
+  <text x="142.598126" y="130.588235" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,142.598126,130.588235)">100</text>
+  <text x="35.294118" y="175.294118" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,35.294118,175.294118)">100</text>
+</svg>
+</td>
+</tr>
+</table></div></div>
+</div>
+<p>If you’re creating intermediate arrays in a loop then it can be helpful to create a function for the loop body, as that will ensure that the temporary arrays are cleaned up.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_var</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataarray</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">.nc&#39;</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">da</span> <span class="o">+</span> <span class="n">temp</span><span class="p">)</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">_rand.nc&#39;</span><span class="p">)</span>
+    <span class="c1"># &#39;da&#39; and &#39;temp&#39; get cleaned up when the function exits</span>
+
+<span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">]:</span>
+    <span class="n">process_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Another issue we have seen is from the NetCDF library not having enough memory available to decompress the data it reads from a file. NetCDF itself needs some memory available in order to open a file, so you need to leave some space for that in your Dask allocation. This needn’t be a massive amount, a hundred megabytes or so should be fine.</p>
+</div>
 </div>
 </div>
 
@@ -730,16 +855,16 @@
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "conda-env-analysis3-21.01-py"
+            mode: "conda-env-analysis3-py"
         },
         kernelOptions: {
-            kernelName: "conda-env-analysis3-21.01-py",
+            kernelName: "conda-env-analysis3-py",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'conda-env-analysis3-21.01-py'</script>
+    <script>kernelName = 'conda-env-analysis3-py'</script>
 
               </div>
               

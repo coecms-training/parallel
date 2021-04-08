@@ -52,9 +52,11 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="dask-intro.html" />
+    <link rel="next" title="Types of parallelism" href="concepts-types.html" />
     <link rel="prev" title="Introduction" href="README.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -99,6 +101,21 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html">
+   Types of parallelism
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html#design-patterns">
+   Design Patterns
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="concepts-types.html#common-gotchas">
+   Common Gotchas
   </a>
  </li>
 </ul>
@@ -220,58 +237,19 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#ahmdhal-s-law">
-   Ahmdhal’s Law
+  <a class="reference internal nav-link" href="#ahmdahl-s-law">
+   Ahmdahl’s Law
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#profiling">
-   Profiling
+  <a class="reference internal nav-link" href="#supercomputer-charges">
+   Supercomputer Charges
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types-of-parallelism">
-   Types of parallelism
+  <a class="reference internal nav-link" href="#profiling-scaling">
+   Profiling Scaling
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#trivial">
-     Trivial
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#vectorised-operators">
-     Vectorised operators
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#shared-memory">
-     Shared Memory
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#distributed">
-     Distributed
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#common-gotchas">
-   Common Gotchas
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#race-conditions">
-     Race Conditions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#locks">
-     Locks
-    </a>
-   </li>
-  </ul>
  </li>
 </ul>
 
@@ -287,49 +265,193 @@
                 
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="ahmdhal-s-law">
-<h2>Ahmdhal’s Law<a class="headerlink" href="#ahmdhal-s-law" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="profiling">
-<h2>Profiling<a class="headerlink" href="#profiling" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="types-of-parallelism">
-<h2>Types of parallelism<a class="headerlink" href="#types-of-parallelism" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="trivial">
-<h3>Trivial<a class="headerlink" href="#trivial" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="vectorised-operators">
-<h3>Vectorised operators<a class="headerlink" href="#vectorised-operators" title="Permalink to this headline">¶</a></h3>
-<p>Fortran:
-sse/avx intrinsics
-optimisation flags</p>
-<p>Python:
-numpy</p>
-</div>
-<div class="section" id="shared-memory">
-<h3>Shared Memory<a class="headerlink" href="#shared-memory" title="Permalink to this headline">¶</a></h3>
-<p>Fortran:
-openmp</p>
-<p>Python:
-Dask</p>
-</div>
-<div class="section" id="distributed">
-<h3>Distributed<a class="headerlink" href="#distributed" title="Permalink to this headline">¶</a></h3>
-<p>Fortran:
-MPI</p>
-<p>Python:
-Multiprocessing
-Dask Distributed</p>
+<p>At its heart, parallel programming is based around techniques for splitting a problem into many smaller parts, where each part can be run at the same time in order to arrive at a final result faster than if the problem was not split. In climate and weather science parallel programming techniques can be used in both data analysis and computer modelling.</p>
+<p>The ways a problem is split up can vary according to the task. For analysing observational data a task might be processing a single weather station, while for a model a task might be evaluating the model on a subregion of the full domain. When converting a dataset from hourly to daily frequency a task might be processing a single year of the full dataset.</p>
+<p>Modern computers can parallelise things on a number of levels - a single CPU chip will have a number of processing ‘cores’, each able to run its own program independently. High end computers can have multiple CPU chips, each a ‘socket’, and computers can themselves be networked into a supercomputer cluster with program run on multiple ‘nodes’, communicating over the network using MPI.</p>
+<p>Throughout this website I’ll generically refer to ‘processors’, which can be read as the CPU cores being used in the parallel program, whether on the same CPU chip or distributed across a supercomputer.</p>
+<p>While generally the programs being run are all the same with each working on part of the data, in some cases some of the programs will be different, for instance in coupled models the programs modelling the atmosphere and ocean are different, but talk to each other to share surface fluxes.</p>
+<div class="section" id="ahmdahl-s-law">
+<h2>Ahmdahl’s Law<a class="headerlink" href="#ahmdahl-s-law" title="Permalink to this headline">¶</a></h2>
+<p>One of the most important things to remember when parallelising a task is the limitations. For a given task, adding more processors won’t keep making it run faster indefinitely - there will always be parts that can’t be parallised (in a model this comes from tasks like reading and writing files, or computing global statistics). As more processors are added only the parallelisable parts get quicker so past some point increasing the number of processors doesn’t produce a useful effect. This is known as <a class="reference external" href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Ahmdahl’s Law</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="n">processors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">48</span><span class="p">)</span>
+<span class="n">serial_fraction</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="c1"># 20 % serial, 80% parallelisable</span>
+<span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">processors</span><span class="p">,</span> <span class="n">runtime</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Processors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Runtime&#39;</span><span class="p">);</span>
+</pre></div>
 </div>
 </div>
-<div class="section" id="common-gotchas">
-<h2>Common Gotchas<a class="headerlink" href="#common-gotchas" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="race-conditions">
-<h3>Race Conditions<a class="headerlink" href="#race-conditions" title="Permalink to this headline">¶</a></h3>
+<div class="cell_output docutils container">
+<img alt="_images/concepts-intro_1_0.png" src="_images/concepts-intro_1_0.png" />
 </div>
-<div class="section" id="locks">
-<h3>Locks<a class="headerlink" href="#locks" title="Permalink to this headline">¶</a></h3>
 </div>
+<p>There are ways to compensate for Ahmdahl’s Law - you can for example use the extra processors to do more work by increasing the resolution.</p>
+<p>Another potential problem to be aware of is that as you add more processors, the time they spend communicating with each other can become significant. Say every process needs to communicate with every other one - there is an <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span> cost from this communication.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">comms_cost</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">processors</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span> <span class="o">+</span> <span class="n">comms_cost</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">processors</span><span class="p">,</span> <span class="n">runtime</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Processors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Runtime&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/concepts-intro_3_0.png" src="_images/concepts-intro_3_0.png" />
+</div>
+</div>
+<p>You can see this has a dramatic effect on what processor count. In models you’re unlikely to see something as costly as <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span>, as processors generally only need to communicate with their neighbours, but this is still a cost to keep in mind. When determining the number of processors to use it’s always best to profile, don’t assume more processors will neccessarily produce results faster.</p>
+</div>
+<div class="section" id="supercomputer-charges">
+<h2>Supercomputer Charges<a class="headerlink" href="#supercomputer-charges" title="Permalink to this headline">¶</a></h2>
+<p>Supercomputers will generally charge for resources in some manner - at NCI supercomputer time is charged in ‘Service Units’, or SU. Projects get an allocation of SU, either from a merit allocation scheme or through a partner share, then any supercomputer use is charged to that account.</p>
+<p>Service Unit cost is proporional to the product of the job runtime and the number of processors - so the combined runtime for all the processors used. The specific queue and memory request then adds a multiplier to this value.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="n">runtime</span> <span class="o">*</span> <span class="n">processors</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">processors</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Processors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Cost&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/concepts-intro_6_0.png" src="_images/concepts-intro_6_0.png" />
+</div>
+</div>
+<p>Users of the supercomputer are expected to use its resources efficiently, as it is a shared resource. There is a balance to be made here - more processors reduces the runtime, so you get results quicker, but can increase cost especially as you approach the speed limits from Ahmdahl’s Law.</p>
+<p>You can estimate the optimal number of processors by finding the minimum of runtime x cost, which gives a balance between fast runtime and low cost. From there you can add more processors if you need faster results at a higher cost, or if you don’t need results super quickly you can lower the number of cpus for a smaller cost.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="n">runtime</span> <span class="o">*</span> <span class="n">processors</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">processors</span><span class="p">,</span> <span class="n">runtime</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Processors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Runtime x Cost&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/concepts-intro_8_0.png" src="_images/concepts-intro_8_0.png" />
+</div>
+</div>
+<p>In the real world you would estimate this minimum point by doing profile runs at a few different processor counts. A <a class="reference external" href="https://en.wikipedia.org/wiki/Binary_search_algorithm">binary search</a> can be helpful - start with getting a high, middle, and low processor count runtime, then focus on the side with the lowest values, checking a processor count halfway between those.</p>
+</div>
+<div class="section" id="profiling-scaling">
+<h2>Profiling Scaling<a class="headerlink" href="#profiling-scaling" title="Permalink to this headline">¶</a></h2>
+<p>In order to tell where you are on the Ahmdahl’s Law curve it’s essential to profile your work - especially if your program will be using a lot of processors or running for a long time. The profilling only needs to be basic - generally just working out the runtime for a small subset of the total work, and extrapolating from that to work out what the full cost would be.</p>
+<p>In modelling, this profiling is generally done by reducing the time domain of a model. Rather than running the model for a full year you only run it for a few days. For data analysis, you might try running it on a representative sample - say a couple years out of a reanalysis that you intend to process fully.</p>
+<p>Keep a record of the time taken for different processor counts, from which you can calculate the total time you expect it to take for the full run. If you are charged for computer time also keep a record of the cost for each processor count.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">io</span>
+<span class="n">record</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">processors, walltime (s), cost (ksu)</span>
+<span class="s2">        96,          182,         35</span>
+<span class="s2">       144,          136,         39</span>
+<span class="s2">       192,          113,         43</span>
+<span class="s2">       240,          104,         50</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">record</span><span class="p">),</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>processors</th>
+      <th>walltime (s)</th>
+      <th>cost (ksu)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>96</td>
+      <td>182</td>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>144</td>
+      <td>136</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>192</td>
+      <td>113</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>240</td>
+      <td>104</td>
+      <td>50</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">60</span> <span class="c1"># Scaled to fit on the plot</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+<span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;processors&#39;</span><span class="p">,</span> <span class="s1">&#39;walltime (s)&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;processors&#39;</span><span class="p">,</span> <span class="s1">&#39;cost (ksu)&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;processors&#39;</span><span class="p">,</span> <span class="s1">&#39;scaling&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/concepts-intro_11_0.png" src="_images/concepts-intro_11_0.png" />
+</div>
+</div>
+<p>Here the optimised cost x walltime is at 192 processors. If this was a 10 day sample, then a full year would be</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">][[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="mi">10</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>walltime (s)    4124.5
+cost (ksu)      1569.5
+Name: 2, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>When making a merit allocation request for supercomputer time at NCI this is the scaling information that they are looking for.</p>
 </div>
 </div>
 
@@ -359,7 +481,7 @@ Dask Distributed</p>
         <div class='prev-next-bottom'>
             
     <a class='left-prev' id="prev-link" href="README.html" title="previous page">Introduction</a>
-    <a class='right-next' id="next-link" href="dask-intro.html" title="next page">Introduction</a>
+    <a class='right-next' id="next-link" href="concepts-types.html" title="next page">Types of parallelism</a>
 
         </div>
         
