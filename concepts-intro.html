@@ -108,16 +108,6 @@
    Types of parallelism
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="concepts-types.html#design-patterns">
-   Design Patterns
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="concepts-types.html#common-gotchas">
-   Common Gotchas
-  </a>
- </li>
 </ul>
 <p class="caption collapsible-parent">
  <span class="caption-text">
@@ -313,7 +303,7 @@
 <img alt="_images/concepts-intro_3_0.png" src="_images/concepts-intro_3_0.png" />
 </div>
 </div>
-<p>You can see this has a dramatic effect on what processor count. In models you’re unlikely to see something as costly as <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span>, as processors generally only need to communicate with their neighbours, but this is still a cost to keep in mind. When determining the number of processors to use it’s always best to profile, don’t assume more processors will neccessarily produce results faster.</p>
+<p>You can see this has a dramatic effect on what processor count gives the fastest result. In models you’re unlikely to see something as costly as <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span>, as processors generally only need to communicate with their neighbours, but this is still a cost to keep in mind. When determining the number of processors to use it’s always best to profile, don’t assume more processors will neccessarily produce results faster.</p>
 </div>
 <div class="section" id="supercomputer-charges">
 <h2>Supercomputer Charges<a class="headerlink" href="#supercomputer-charges" title="Permalink to this headline">¶</a></h2>
@@ -441,7 +431,7 @@
 <img alt="_images/concepts-intro_11_0.png" src="_images/concepts-intro_11_0.png" />
 </div>
 </div>
-<p>Here the optimised cost x walltime is at 192 processors. If this was a 10 day sample, then a full year would be</p>
+<p>Here the optimised cost x walltime is at 192 processors. If this was a 10 day sample, then a full year’s resources would be:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">2</span><span class="p">]][[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="mi">10</span>
