@@ -278,7 +278,7 @@
 <div class="section" id="ahmdahl-s-law">
 <h2>Ahmdahl’s Law<a class="headerlink" href="#ahmdahl-s-law" title="Permalink to this headline">¶</a></h2>
 <p>One of the most important things to remember when parallelising a task is the limitations. For a given task, adding more processors won’t keep making it run faster indefinitely - there will always be parts that can’t be parallised (in a model this comes from tasks like reading and writing files, or computing global statistics). As more processors are added only the parallelisable parts get quicker so past some point increasing the number of processors doesn’t produce a useful effect. This is known as <a class="reference external" href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Ahmdahl’s Law</a>.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -298,7 +298,7 @@
 </div>
 <p>There are ways to compensate for Ahmdahl’s Law - you can for example use the extra processors to do more work by increasing the resolution.</p>
 <p>Another potential problem to be aware of is that as you add more processors, the time they spend communicating with each other can become significant. Say every process needs to communicate with every other one - there is an <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span> cost from this communication.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">comms_cost</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">processors</span><span class="o">**</span><span class="mi">2</span>
 <span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span> <span class="o">+</span> <span class="n">comms_cost</span>
@@ -319,7 +319,7 @@
 <h2>Supercomputer Charges<a class="headerlink" href="#supercomputer-charges" title="Permalink to this headline">¶</a></h2>
 <p>Supercomputers will generally charge for resources in some manner - at NCI supercomputer time is charged in ‘Service Units’, or SU. Projects get an allocation of SU, either from a merit allocation scheme or through a partner share, then any supercomputer use is charged to that account.</p>
 <p>Service Unit cost is proporional to the product of the job runtime and the number of processors - so the combined runtime for all the processors used. The specific queue and memory request then adds a multiplier to this value.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span>
 <span class="n">cost</span> <span class="o">=</span> <span class="n">runtime</span> <span class="o">*</span> <span class="n">processors</span>
@@ -336,7 +336,7 @@
 </div>
 <p>Users of the supercomputer are expected to use its resources efficiently, as it is a shared resource. There is a balance to be made here - more processors reduces the runtime, so you get results quicker, but can increase cost especially as you approach the speed limits from Ahmdahl’s Law.</p>
 <p>You can estimate the optimal number of processors by finding the minimum of runtime x cost, which gives a balance between fast runtime and low cost. From there you can add more processors if you need faster results at a higher cost, or if you don’t need results super quickly you can lower the number of cpus for a smaller cost.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">runtime</span> <span class="o">=</span> <span class="n">serial_fraction</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">serial_fraction</span><span class="p">)</span><span class="o">/</span><span class="n">processors</span>
 <span class="n">cost</span> <span class="o">=</span> <span class="n">runtime</span> <span class="o">*</span> <span class="n">processors</span>
@@ -358,7 +358,7 @@
 <p>In order to tell where you are on the Ahmdahl’s Law curve it’s essential to profile your work - especially if your program will be using a lot of processors or running for a long time. The profilling only needs to be basic - generally just working out the runtime for a small subset of the total work, and extrapolating from that to work out what the full cost would be.</p>
 <p>In modelling, this profiling is generally done by reducing the time domain of a model. Rather than running the model for a full year you only run it for a few days. For data analysis, you might try running it on a representative sample - say a couple years out of a reanalysis that you intend to process fully.</p>
 <p>Keep a record of the time taken for different processor counts, from which you can calculate the total time you expect it to take for the full run. If you are charged for computer time also keep a record of the cost for each processor count.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">io</span>
 <span class="n">record</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -426,7 +426,7 @@
 </table>
 </div></div></div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">60</span> <span class="c1"># Scaled to fit on the plot</span>
 
@@ -442,19 +442,44 @@
 </div>
 </div>
 <p>Here the optimised cost x walltime is at 192 processors. If this was a 10 day sample, then a full year would be</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">][[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="mi">10</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">2</span><span class="p">]][[</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;cost (ksu)&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="mi">10</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>walltime (s)    4124.5
-cost (ksu)      1569.5
-Name: 2, dtype: float64
-</pre></div>
-</div>
-</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>walltime (s)</th>
+      <th>cost (ksu)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>4124.5</td>
+      <td>1569.5</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>When making a merit allocation request for supercomputer time at NCI this is the scaling information that they are looking for.</p>
 </div>
