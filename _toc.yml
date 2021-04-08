@@ -2,6 +2,7 @@
 - part: Concepts
   chapters:
     - file: concepts-intro
+    - file: concepts-types
 - part: Dask
   chapters:
     - file: dask-intro
