@@ -2,8 +2,10 @@
 - part: Concepts
   chapters:
     - file: concepts-intro
+    - file: concepts-types
 - part: Dask
   chapters:
     - file: dask-intro
     - file: dask-performance
+    - file: dask-troubleshooting
     - file: case-studies/read_speed
