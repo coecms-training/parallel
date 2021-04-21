@@ -1,5 +1,8 @@
 depend=on:1
 
+BENCHMARK=benchmark_era5_t2_load.py
+
+# Submit the jobs in sequence with -Wdepend so that the csv file writes don't have a race
 for N in 32 48; do
 jobid=$(qsub << EOF
 #!/bin/bash
@@ -18,7 +21,7 @@ module load conda/analysis3-21.04
 
 set -eu
 
-python benchmark_read.py
+python $BENCHMARK
 EOF
 )
 echo $N $jobid $depend
