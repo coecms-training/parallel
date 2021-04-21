@@ -254,7 +254,7 @@
                 
   <div class="section" id="measuring-performance">
 <h1>Measuring Performance<a class="headerlink" href="#measuring-performance" title="Permalink to this headline">¶</a></h1>
-<p>Here’s some examples of how to find the optimal worker count and chunk size for different Dask operations.</p>
+<p>Here’s some examples of how to find the optimal worker count and chunk size for different Dask operations. See the scripts in <a class="reference external" href="https://github.com/coecms-training/parallel/tree/main/case-studies/read_speed">the github repository</a> for samples of how these were measured.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The first time a file is read can be quite slow if it’s not in cache. When running benchmarks make sure to load the file fully once (e.g. with <code class="docutils literal notranslate"><span class="pre">data.mean().load()</span></code>) before doing any timing.</p>
@@ -285,7 +285,7 @@
 </pre></div>
 </div>
 <p>and saved the results in a netcdf file</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-output docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;read_speed/era5_t2_load.csv&#39;</span><span class="p">)</span>
 <span class="n">df</span>
@@ -458,7 +458,7 @@
 </div>
 </div>
 <p>and to narrow the results down further I’ll select a single chunk layout of <code class="docutils literal notranslate"><span class="pre">{'time':</span> <span class="pre">None,</span> <span class="pre">'latitude':</span> <span class="pre">91,</span> <span class="pre">'longitude':</span> <span class="pre">180}</span></code>. This is the file chunk size in the horizontal dimensions, about 49 MB per chunk.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_91_180</span> <span class="o">=</span> <span class="n">one_thread</span><span class="p">[(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">latitude</span><span class="o">==</span><span class="mi">91</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">longitude</span><span class="o">==</span><span class="mi">180</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">time</span><span class="p">)]</span>
 <span class="n">df_91_180</span> <span class="o">=</span> <span class="n">df_91_180</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -593,7 +593,7 @@
 <p class="admonition-title">Note</p>
 <p>The maximum number of CPUs on a single Gadi node is 48, and the default Dask cluster can’t go beyond that.</p>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wall</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
 <span class="n">wall</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -610,7 +610,7 @@
 <p class="admonition-title">Note</p>
 <p>Remember this is the cost for <em>just</em> loading the data and calculating the global mean. Further processing can affect the cost scaling as well</p>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -623,7 +623,7 @@
 </div>
 </div>
 <p>To find a good balance of walltime and cost we want to minimise <span class="math notranslate nohighlight">\(\textrm{walltime}\times\textrm{cost}\)</span>. The best worker count by this metric for this single operation is 32 workers.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">2.5</span><span class="p">])</span>
@@ -636,7 +636,7 @@
 </div>
 </div>
 <p>We’ve worked out the best worker count to use, how about the chunk size? The best size here is in the 50 to 100 MB range. Generally the chunk size should be an integer multiple of the file chunk size to make things easy for the NetCDF library, but this doesn’t have a huge effect.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_thread</span><span class="p">[</span><span class="n">one_thread</span><span class="o">.</span><span class="n">workers</span> <span class="o">==</span> <span class="mi">32</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
