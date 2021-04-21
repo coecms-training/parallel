@@ -6,3 +6,4 @@
   chapters:
     - file: dask-intro
     - file: dask-performance
+    - file: case-studies/read_speed
