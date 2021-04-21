@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Measuring Performance &#8212; Parallel Programming in Climate and Weather</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Pathological Behaviour and Troubleshooting" href="../dask-troubleshooting.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  
+  <h1 class="site-logo" id="site-title">Parallel Programming in Climate and Weather</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Front Matter
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Concepts
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../concepts-intro.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../concepts-types.html">
+   Types of parallelism
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Dask
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-intro.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-performance.html">
+   Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-troubleshooting.html">
+   Pathological Behaviour and Troubleshooting
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Measuring Performance
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/case-studies/read_speed.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/coecms-training/parallel"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/coecms-training/parallel/master?urlpath=tree/case-studies/read_speed.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#era5-single-level-one-year-mean">
+   ERA5 single level one year mean
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="measuring-performance">
+<h1>Measuring Performance<a class="headerlink" href="#measuring-performance" title="Permalink to this headline">¶</a></h1>
+<p>Here’s some examples of how to find the optimal worker count and chunk size for different Dask operations.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The first time a file is read can be quite slow if it’s not in cache. When running benchmarks make sure to load the file fully once (e.g. with <code class="docutils literal notranslate"><span class="pre">data.mean().load()</span></code>) before doing any timing.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="era5-single-level-one-year-mean">
+<h2>ERA5 single level one year mean<a class="headerlink" href="#era5-single-level-one-year-mean" title="Permalink to this headline">¶</a></h2>
+<p>Lets look at performance for reading in a year of ERA5 single level data. This data comes from compressed netcdf files, so the time spent decompressing will affect our measurements.</p>
+<p>I’ve run for various chunk sizes and Dask cluster sizes</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/g/data/rt52/era5/single-levels/reanalysis/2t/2001/2t_era5_oper_sfc_*.nc&quot;</span>
+<span class="k">with</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="s2">&quot;nested&quot;</span><span class="p">,</span> <span class="n">concat_dim</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>and saved the results in a netcdf file</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;read_speed/era5_t2_load.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>duration</th>
+      <th>data_size</th>
+      <th>chunk_size</th>
+      <th>time</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>workers</th>
+      <th>threads</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>38.058817</td>
+      <td>36379929600</td>
+      <td>194987520</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>360</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>38.475415</td>
+      <td>36379929600</td>
+      <td>97493760</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>180</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>38.962101</td>
+      <td>36379929600</td>
+      <td>48746880</td>
+      <td>NaN</td>
+      <td>91</td>
+      <td>180</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39.011292</td>
+      <td>36379929600</td>
+      <td>97493760</td>
+      <td>NaN</td>
+      <td>91</td>
+      <td>360</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50.406360</td>
+      <td>36379929600</td>
+      <td>6093360</td>
+      <td>93.0</td>
+      <td>91</td>
+      <td>180</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>77</th>
+      <td>8.271356</td>
+      <td>36379929600</td>
+      <td>97493760</td>
+      <td>NaN</td>
+      <td>91</td>
+      <td>360</td>
+      <td>32</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>8.608944</td>
+      <td>36379929600</td>
+      <td>194987520</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>360</td>
+      <td>32</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>79</th>
+      <td>9.180346</td>
+      <td>36379929600</td>
+      <td>389975040</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>720</td>
+      <td>32</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>80</th>
+      <td>10.643530</td>
+      <td>36379929600</td>
+      <td>24373440</td>
+      <td>NaN</td>
+      <td>91</td>
+      <td>90</td>
+      <td>32</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>81</th>
+      <td>14.079520</td>
+      <td>36379929600</td>
+      <td>6093360</td>
+      <td>93.0</td>
+      <td>91</td>
+      <td>180</td>
+      <td>32</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>82 rows × 8 columns</p>
+</div></div></div>
+</div>
+<p>To start off with, let’s look at the mean walltime for a given cluster and chunk size. I’ll focus on a single thread as well.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;threads&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">one_thread</span> <span class="o">=</span> <span class="n">mean</span><span class="p">[</span><span class="n">mean</span><span class="o">.</span><span class="n">threads</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>and to narrow the results down further I’ll select a single chunk layout of <code class="docutils literal notranslate"><span class="pre">{'time':</span> <span class="pre">None,</span> <span class="pre">'latitude':</span> <span class="pre">91,</span> <span class="pre">'longitude':</span> <span class="pre">180}</span></code>. This is the file chunk size in the horizontal dimensions, about 49 MB per chunk.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_91_180</span> <span class="o">=</span> <span class="n">one_thread</span><span class="p">[(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">latitude</span><span class="o">==</span><span class="mi">91</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">longitude</span><span class="o">==</span><span class="mi">180</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">time</span><span class="p">)]</span>
+<span class="n">df_91_180</span> <span class="o">=</span> <span class="n">df_91_180</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df_91_180</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>workers</th>
+      <th>chunk_size</th>
+      <th>threads</th>
+      <th>duration</th>
+      <th>data_size</th>
+      <th>time</th>
+      <th>latitude</th>
+      <th>longitude</th>
+    </tr>
+    <tr>
+      <th>workers</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>192.943019</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>86.172158</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>39.269419</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>8</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>21.874852</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>16</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>12.386297</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>32</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>7.515120</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>48</td>
+      <td>48746880</td>
+      <td>1</td>
+      <td>6.772545</td>
+      <td>3.637993e+10</td>
+      <td>NaN</td>
+      <td>91.0</td>
+      <td>180.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Plotting the walltime taken for different worker sizes looks good, ideally this should be proportional to <span class="math notranslate nohighlight">\( 1 / \textrm{workers}\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The maximum number of CPUs on a single Gadi node is 48, and the default Dask cluster can’t go beyond that.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wall</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
+<span class="n">wall</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/read_speed_9_0.png" src="../_images/read_speed_9_0.png" />
+</div>
+</div>
+<p>Gadi’s run costs are proportional to <span class="math notranslate nohighlight">\(\textrm{walltime}\times\textrm{workers}\)</span>. The cost minimum is at about 4 workers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remember this is the cost for <em>just</em> loading the data and calculating the global mean. Further processing can affect the cost scaling as well</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;cost (Gadi SU)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/read_speed_11_0.png" src="../_images/read_speed_11_0.png" />
+</div>
+</div>
+<p>To find a good balance of walltime and cost we want to minimise <span class="math notranslate nohighlight">\(\textrm{walltime}\times\textrm{cost}\)</span>. The best worker count by this metric for this single operation is 32 workers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">5000</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;scaling metric (lower is better)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/read_speed_13_0.png" src="../_images/read_speed_13_0.png" />
+</div>
+</div>
+<p>We’ve worked out the best worker count to use, how about the chunk size? The best size here is in the 50 to 100 MB range. Generally the chunk size should be an integer multiple of the file chunk size to make things easy for the NetCDF library, but this doesn’t have a huge effect.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_thread</span><span class="p">[</span><span class="n">one_thread</span><span class="o">.</span><span class="n">workers</span> <span class="o">==</span> <span class="mi">32</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;100 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;200 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;300 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;400 MB&#39;</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">parse_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlabels</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">xlabels</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;chunk size&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/read_speed_15_0.png" src="../_images/read_speed_15_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-analysis3-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-analysis3-py",
+            path: "./case-studies"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-analysis3-py'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="../dask-troubleshooting.html" title="previous page">Pathological Behaviour and Troubleshooting</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By CLEX CMS<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>
