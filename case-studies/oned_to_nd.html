@@ -51,6 +51,7 @@
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Loading Ensemble Members" href="loading_ensemble.html" />
     <link rel="prev" title="Measuring Performance" href="read_speed.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -139,6 +140,11 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Converting a function from 1D to ND
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="loading_ensemble.html">
+   Loading Ensemble Members
   </a>
  </li>
 </ul>
@@ -314,7 +320,7 @@
 </div>
 <div class="section" id="nd-function">
 <h2>Nd function<a class="headerlink" href="#nd-function" title="Permalink to this headline">¶</a></h2>
-<p>To convert the 1d function to work on a nd dataset, use <code class="docutils literal notranslate"><span class="pre">dask.array.apply_along_axis</span></code> (a dask-array version of <code class="docutils literal notranslate"><span class="pre">numpy.apply_along_axis</span></code>). This will process the chunks in parallel</p>
+<p>To convert the 1d function to work on a nd dataset, use <a class="reference external" href="https://docs.dask.org/en/latest/array-api.html#dask.array.apply_along_axis"><code class="docutils literal notranslate"><span class="pre">dask.array.apply_along_axis</span></code></a> (a dask-array version of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.apply_along_axis.html"><code class="docutils literal notranslate"><span class="pre">numpy.apply_along_axis</span></code></a>). This will process the chunks in parallel</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">edof</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
@@ -800,7 +806,7 @@ Attributes:
 </div>
 <div class="section" id="start-a-dask-client">
 <h2>Start a dask client<a class="headerlink" href="#start-a-dask-client" title="Permalink to this headline">¶</a></h2>
-<p>I’m running on Gadi, <code class="docutils literal notranslate"><span class="pre">climtas.nci.GadiClient()</span></code> gets the available resources from PBS, or you can start up a client manually with <code class="docutils literal notranslate"><span class="pre">dask.distributed.Client()</span></code>.</p>
+<p>I’m running on Gadi, <a class="reference external" href="https://climtas.readthedocs.io/en/latest/nci.html#climtas.nci.GadiClient"><code class="docutils literal notranslate"><span class="pre">climtas.nci.GadiClient()</span></code></a> gets the available resources from PBS, or you can start up a client manually with <a class="reference external" href="https://distributed.dask.org/en/latest/quickstart.html#setup-dask-distributed-the-easy-way"><code class="docutils literal notranslate"><span class="pre">dask.distributed.Client()</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climtas.nci</span>
@@ -916,6 +922,7 @@ Wall time: 3min 59s
         <div class='prev-next-bottom'>
             
     <a class='left-prev' id="prev-link" href="read_speed.html" title="previous page">Measuring Performance</a>
+    <a class='right-next' id="next-link" href="loading_ensemble.html" title="next page">Loading Ensemble Members</a>
 
         </div>
         
