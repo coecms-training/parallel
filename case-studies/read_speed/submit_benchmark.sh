@@ -3,7 +3,7 @@ depend=on:1
 BENCHMARK=benchmark_era5_t2_climatology.py
 
 # Submit the jobs in sequence with -Wdepend so that the csv file writes don't have a race
-for N in 2 4 8 16 32 48; do
+for N in 32; do
 jobid=$(qsub << EOF
 #!/bin/bash
 #PBS -N bench_$N
