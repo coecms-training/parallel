@@ -20,6 +20,8 @@ import pandas
 import numpy
 import time
 import dask
+import climtas
+import os
 
 
 def test_load(path, variable, chunks, isel=None):
@@ -30,8 +32,12 @@ def test_load(path, variable, chunks, isel=None):
         if isel is not None:
             var = var.isel(**isel)
 
+        out = os.path.join(os.environ['TMPDIR'],'sample.nc')
+
         start = time.perf_counter()
-        mean = var.mean().load()
+        daily = climtas.blocked_resample(var, time=24).mean()
+        climatology = climtas.blocked_groupby(daily, time='dayofyear').mean()
+        climtas.io.to_netcdf_throttled(climatology, out)
         duration = time.perf_counter() - start
 
     data_size = var.nbytes
@@ -68,30 +74,33 @@ if __name__ == '__main__':
     workers = len(c.cluster.workers)
     threads = c.cluster.workers[0].nthreads
 
-
-    path = "/g/data/rt52/era5/single-levels/reanalysis/2t/2001/2t_era5_oper_sfc_*.nc"
+    path = "/g/data/rt52/era5/single-levels/reanalysis/2t/200*/2t_era5_oper_sfc_*.nc"
+    var = 't2m'
 
     # Warm the cache
-    test_load(path, "t2m", {"latitude": 91, "longitude": 180})
+    xarray.open_mfdataset(path, {"latitude": 91, "longitude": 180})[var].mean().load()
 
     df = test_load_chunks(
         path,
-        "t2m",
+        var,
         chunk_list = [
-            {"time": 93, "latitude": 91,   "longitude": 180},
             {"latitude": 91,   "longitude": 180//2},
             {"latitude": 91,   "longitude": 180},
             {"latitude": 91,   "longitude": 180*2},
             {"latitude": 91*2, "longitude": 180},
             {"latitude": 91*2, "longitude": 180*2},
-            {"latitude": 91*2, "longitude": 180*4},
         ],
     )
 
     df['workers'] = workers
     df['threads'] = threads
 
-    prev = pandas.read_csv('era5_t2_load.csv')
-    df = pandas.concat([prev, df])
+    logfile = 'era5_t2_climatology.csv'
 
-    df.to_csv('era5_t2_load.csv', index=False)
+    try:
+        prev = pandas.read_csv(logfile)
+        df = pandas.concat([prev, df])
+    except FileNotFoundError:
+        pass
+
+    df.to_csv(logfile, index=False)

@@ -9,3 +9,6 @@
     - file: dask-performance
     - file: dask-troubleshooting
     - file: case-studies/read_speed
+- part: Case Studies
+  chapters:
+    - file: case-studies/oned_to_nd
