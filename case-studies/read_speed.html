@@ -255,6 +255,18 @@
    ERA5 single level one year mean
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#era5-10-year-climatology">
+   ERA5 10-year climatology
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimal-results">
+     Optimal results:
+    </a>
+   </li>
+  </ul>
+ </li>
 </ul>
 
             </nav>
@@ -403,63 +415,63 @@
       <td>...</td>
     </tr>
     <tr>
-      <th>77</th>
-      <td>8.271356</td>
-      <td>36379929600</td>
-      <td>97493760</td>
-      <td>NaN</td>
-      <td>91</td>
-      <td>360</td>
-      <td>32</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>78</th>
-      <td>8.608944</td>
-      <td>36379929600</td>
-      <td>194987520</td>
-      <td>NaN</td>
-      <td>182</td>
-      <td>360</td>
-      <td>32</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>79</th>
-      <td>9.180346</td>
-      <td>36379929600</td>
-      <td>389975040</td>
-      <td>NaN</td>
-      <td>182</td>
-      <td>720</td>
-      <td>32</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>80</th>
-      <td>10.643530</td>
-      <td>36379929600</td>
-      <td>24373440</td>
-      <td>NaN</td>
-      <td>91</td>
-      <td>90</td>
-      <td>32</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>81</th>
-      <td>14.079520</td>
+      <th>112</th>
+      <td>17.296662</td>
       <td>36379929600</td>
       <td>6093360</td>
       <td>93.0</td>
       <td>91</td>
       <td>180</td>
-      <td>32</td>
+      <td>16</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>113</th>
+      <td>18.460571</td>
+      <td>36379929600</td>
+      <td>97493760</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>180</td>
+      <td>16</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>114</th>
+      <td>18.579301</td>
+      <td>36379929600</td>
+      <td>97493760</td>
+      <td>NaN</td>
+      <td>91</td>
+      <td>360</td>
+      <td>16</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>115</th>
+      <td>20.263248</td>
+      <td>36379929600</td>
+      <td>194987520</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>360</td>
+      <td>16</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>116</th>
+      <td>20.702859</td>
+      <td>36379929600</td>
+      <td>389975040</td>
+      <td>NaN</td>
+      <td>182</td>
+      <td>720</td>
+      <td>16</td>
       <td>1</td>
     </tr>
   </tbody>
 </table>
-<p>82 rows × 8 columns</p>
+<p>117 rows × 8 columns</p>
 </div></div></div>
 </div>
 <p>To start off with, let’s look at the mean walltime for a given cluster and chunk size. I’ll focus on a single thread as well.</p>
@@ -570,7 +582,7 @@
       <td>16</td>
       <td>48746880</td>
       <td>1</td>
-      <td>12.386297</td>
+      <td>13.159739</td>
       <td>3.637993e+10</td>
       <td>NaN</td>
       <td>91.0</td>
@@ -581,7 +593,7 @@
       <td>32</td>
       <td>48746880</td>
       <td>1</td>
-      <td>7.515120</td>
+      <td>7.959964</td>
       <td>3.637993e+10</td>
       <td>NaN</td>
       <td>91.0</td>
@@ -592,7 +604,7 @@
       <td>48</td>
       <td>48746880</td>
       <td>1</td>
-      <td>6.772545</td>
+      <td>6.344361</td>
       <td>3.637993e+10</td>
       <td>NaN</td>
       <td>91.0</td>
@@ -627,7 +639,7 @@
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:orange&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;cost (Gadi SU)&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -639,7 +651,7 @@
 <p>To find a good balance of walltime and cost we want to minimise <span class="math notranslate nohighlight">\(\textrm{walltime}\times\textrm{cost}\)</span>. The best worker count by this metric for this single operation is 32 workers.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">2.5</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;scaling metric (lower is better)&#39;</span><span class="p">);</span>
 </pre></div>
@@ -666,9 +678,15 @@
 <img alt="../_images/read_speed_15_0.png" src="../_images/read_speed_15_0.png" />
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_results</span><span class="p">(</span><span class="n">csv</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">result_scaling</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">wall</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">scaling</span> <span class="o">=</span> <span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span>
+    <span class="k">return</span> <span class="n">wall</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">scaling</span>
+
+<span class="k">def</span> <span class="nf">plot_results</span><span class="p">(</span><span class="n">csv</span><span class="p">,</span> <span class="n">target_workers</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>
     
     <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;threads&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -676,40 +694,114 @@
     <span class="n">df_91_180</span> <span class="o">=</span> <span class="n">one_thread</span><span class="p">[(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">latitude</span><span class="o">==</span><span class="mi">91</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">one_thread</span><span class="o">.</span><span class="n">longitude</span><span class="o">==</span><span class="mi">180</span><span class="p">)]</span>
     <span class="n">df_91_180</span> <span class="o">=</span> <span class="n">df_91_180</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     
+    <span class="n">wall</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">scaling</span> <span class="o">=</span> <span class="n">result_scaling</span><span class="p">(</span><span class="n">df_91_180</span><span class="p">)</span>
+    
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">wall</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
     <span class="n">wall</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">);</span>
         
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_91_180</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:orange&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;cost (Gadi SU)&#39;</span><span class="p">);</span>
     
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">wall</span> <span class="o">*</span> <span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">)</span>
+    <span class="n">scaling</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">)</span>
     <span class="c1">#plt.ylim([0,1200])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;scaling metric (lower is better)&#39;</span><span class="p">);</span>
     
+    <span class="n">df_chunksize</span> <span class="o">=</span> <span class="n">one_thread</span><span class="p">[</span><span class="n">one_thread</span><span class="o">.</span><span class="n">workers</span> <span class="o">==</span> <span class="n">target_workers</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">wall</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">scaling</span> <span class="o">=</span> <span class="n">result_scaling</span><span class="p">(</span><span class="n">df_chunksize</span><span class="p">)</span>
+    
+    <span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;100 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;200 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;300 MB&#39;</span><span class="p">]</span>
+    
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
-    <span class="n">one_thread</span><span class="p">[</span><span class="n">one_thread</span><span class="o">.</span><span class="n">workers</span> <span class="o">==</span> <span class="mi">32</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-    <span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;100 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;200 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;300 MB&#39;</span><span class="p">,</span> <span class="s1">&#39;400 MB&#39;</span><span class="p">]</span>
+    <span class="n">wall</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">parse_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlabels</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">xlabels</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;chunk size&#39;</span><span class="p">);</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;walltime (s)&#39;</span><span class="p">);</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:orange&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">parse_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlabels</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">xlabels</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;chunk size&#39;</span><span class="p">);</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;cost (Gadi SU)&#39;</span><span class="p">);</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">scaling</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">parse_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlabels</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">xlabels</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;chunk size&#39;</span><span class="p">);</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;scaling metric (lower is better)&#39;</span><span class="p">);</span>
+
+<span class="k">def</span> <span class="nf">optimal_size</span><span class="p">(</span><span class="n">csv</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;workers&#39;</span><span class="p">,</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span><span class="s1">&#39;threads&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">mean</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">mean</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">mean</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="n">mean</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">cost</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Workers:  </span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">workers</span><span class="si">:</span><span class="s1">2.0f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Threads:  </span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">threads</span><span class="si">:</span><span class="s1">2.0f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Walltime:  </span><span class="si">{</span><span class="n">pandas</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cost:     </span><span class="si">{</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">duration</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">opt</span><span class="o">.</span><span class="n">workers</span><span class="o">*</span><span class="mi">2</span><span class="si">:</span><span class="s2">5.2f</span><span class="si">}</span><span class="s2"> SU&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chunks:   </span><span class="si">{</span><span class="n">opt</span><span class="p">[[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+</div>
+<div class="section" id="era5-10-year-climatology">
+<h2>ERA5 10-year climatology<a class="headerlink" href="#era5-10-year-climatology" title="Permalink to this headline">¶</a></h2>
+<p>Calculating a daily mean climatology from 10 years of hourly ERA5 data, using climtas functions for resampling and groupby, saving the results to a compressed netcdf file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/g/data/rt52/era5/single-levels/reanalysis/2t/200*/2t_era5_oper_sfc_*.nc&quot;</span>
+<span class="n">var</span> <span class="o">=</span> <span class="s1">&#39;t2m&#39;</span>
+
+<span class="k">with</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="s2">&quot;nested&quot;</span><span class="p">,</span> <span class="n">concat_dim</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">isel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">isel</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TMPDIR&#39;</span><span class="p">],</span><span class="s1">&#39;sample.nc&#39;</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">daily</span> <span class="o">=</span> <span class="n">climtas</span><span class="o">.</span><span class="n">blocked_resample</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">climatology</span> <span class="o">=</span> <span class="n">climtas</span><span class="o">.</span><span class="n">blocked_groupby</span><span class="p">(</span><span class="n">daily</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">climtas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">to_netcdf_throttled</span><span class="p">(</span><span class="n">climatology</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+</pre></div>
+</div>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="n">plot_results</span><span class="p">(</span><span class="s1">&#39;read_speed/era5_t2_climatology.csv&#39;</span><span class="p">)</span>
+<span class="n">plot_results</span><span class="p">(</span><span class="s1">&#39;read_speed/era5_t2_climatology.csv&#39;</span><span class="p">,</span> <span class="n">target_workers</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/read_speed_17_0.png" src="../_images/read_speed_17_0.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Workers: 48.0
+</pre></div>
+</div>
+<img alt="../_images/read_speed_18_1.png" src="../_images/read_speed_18_1.png" />
+</div>
+</div>
+<div class="section" id="optimal-results">
+<h3>Optimal results:<a class="headerlink" href="#optimal-results" title="Permalink to this headline">¶</a></h3>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">optimal_size</span><span class="p">(</span><span class="s1">&#39;read_speed/era5_t2_climatology.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Workers:  32
+Threads:   1
+Walltime:  0 days 00:02:41
+Cost:      0.13 SU
+Chunks:   {&#39;latitude&#39;: 91.0, &#39;longitude&#39;: 180.0}
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -762,10 +854,9 @@
 
       </div>
     </div>
-    
+  
   <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
 
-
-    
+  
   </body>
 </html>
