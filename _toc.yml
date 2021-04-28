@@ -13,3 +13,4 @@
   chapters:
     - file: case-studies/oned_to_nd
     - file: case-studies/loading_ensemble
+    - file: case-studies/climatology_multivar
