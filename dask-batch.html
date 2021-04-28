@@ -269,6 +269,11 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#checking-on-batch-jobs">
+   Checking on batch jobs
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#example">
    Example
   </a>
@@ -350,6 +355,16 @@ python ./myscript.py
 <p>If you’re using the jobfs disk on Gadi, make sure your run script has a <code class="docutils literal notranslate"><span class="pre">#PBS</span> <span class="pre">-l</span> <span class="pre">jobfs</span></code> resource request</p>
 </div>
 </div>
+<div class="section" id="checking-on-batch-jobs">
+<h2>Checking on batch jobs<a class="headerlink" href="#checking-on-batch-jobs" title="Permalink to this headline">¶</a></h2>
+<p>When you submit a job with <code class="docutils literal notranslate"><span class="pre">qsub</span></code> you’ll get a job ID number from the queue system. This ID number can be used to stop the job running if needed, with <code class="docutils literal notranslate"><span class="pre">qdel</span> <span class="pre">JOB_ID</span></code>.</p>
+<p>You can check on the status of your jobs with <code class="docutils literal notranslate"><span class="pre">qstat</span></code>. On Gadi, the script <code class="docutils literal notranslate"><span class="pre">/g/data/hh5/public/apps/nci_scripts/uqstat</span></code> shows extended information about a job, including how much of its CPU and memory request it is using.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                  <span class="n">project</span>    <span class="n">user</span>         <span class="n">name</span>     <span class="n">queue</span> <span class="n">state</span>  <span class="n">ncpus</span>        <span class="n">walltime</span> <span class="n">su</span> <span class="n">mem_pct</span> <span class="n">cpu_pct</span>           <span class="n">qtime</span>
+<span class="mf">21672958.</span><span class="n">gadi</span><span class="o">-</span><span class="n">pbs</span>     <span class="n">w35</span>  <span class="n">saw562</span>  <span class="n">jupyter</span><span class="o">-</span><span class="n">lab</span>  <span class="n">normalbw</span>     <span class="n">R</span>      <span class="mi">1</span> <span class="mi">0</span> <span class="n">days</span> <span class="mi">00</span><span class="p">:</span><span class="mi">01</span><span class="p">:</span><span class="mi">18</span>  <span class="mi">0</span>     <span class="mi">14</span><span class="o">%</span>     <span class="mi">35</span><span class="o">%</span> <span class="mi">0</span> <span class="n">days</span> <span class="mi">00</span><span class="p">:</span><span class="mi">01</span><span class="p">:</span><span class="mi">00</span>
+</pre></div>
+</div>
+<p>This is useful to check that your job is actually running in parallel - if the CPU percent is very low then it’s possible your job is running in serial mode</p>
+</div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>Here’s a small example batch setup. You submit the job with <code class="docutils literal notranslate"><span class="pre">qsub</span> <span class="pre">submit_mean.pbs</span></code>, the batch script then runs the python script for you.</p>
@@ -372,7 +387,7 @@ module load conda/analysis3-21.04
 python ./mean.py
 </pre></div>
 </div>
-<p><strong><a class="reference external" href="http://mean.py">mean.py</a></strong></p>
+<p><strong>mean.py</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xarray</span>
 <span class="kn">import</span> <span class="nn">climtas.nci</span>
 
