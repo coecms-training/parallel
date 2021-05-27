@@ -3,6 +3,7 @@
   chapters:
     - file: concepts-intro
     - file: concepts-types
+    - file: design-patterns
 - part: Dask
   chapters:
     - file: dask-intro
