@@ -148,8 +148,13 @@
 </p>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="case-studies/oned_to_nd_rewrite.html">
+   Converting a function from 1D to ND - slice method
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="case-studies/oned_to_nd.html">
-   Converting a function from 1D to ND
+   Converting a function from 1D to ND - apply_along_axis
   </a>
  </li>
  <li class="toctree-l1">
@@ -368,7 +373,7 @@
 </div>
 <div class="section" id="fortran">
 <h3>Fortran<a class="headerlink" href="#fortran" title="Permalink to this headline">¶</a></h3>
-<p>In fortran you can set up array indices so that the data within the domain is indexed normally from 1 to N, but if you read beyond the domain then the data comes from the halo. Here when <code class="docutils literal notranslate"><span class="pre">i=1</span></code>, <code class="docutils literal notranslate"><span class="pre">a(i-1,j)</span></code> gets read from the halo data.</p>
+<p>In fortran you can set up array indices so that the data within the domain is indexed normally from 1 to N, but if you read beyond the domain then the data comes from the halo. Here at the start of the loop when <code class="docutils literal notranslate"><span class="pre">i</span></code> is 1 <code class="docutils literal notranslate"><span class="pre">a(i-1,j)</span></code> gets read from the halo data.</p>
 <div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">nx</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">ny</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">halo</span> <span class="o">=</span> <span class="mi">2</span>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Converting a function from 1D to ND &#8212; Parallel Programming in Climate and Weather</title>
+    <title>Converting a function from 1D to ND - apply_along_axis &#8212; Parallel Programming in Climate and Weather</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet" />
   <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Loading Ensemble Members" href="loading_ensemble.html" />
-    <link rel="prev" title="Batch Scripts" href="../dask-batch.html" />
+    <link rel="prev" title="Converting a function from 1D to ND - slice method" href="oned_to_nd_rewrite.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -147,9 +147,14 @@
  </span>
 </p>
 <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="oned_to_nd_rewrite.html">
+   Converting a function from 1D to ND - slice method
+  </a>
+ </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Converting a function from 1D to ND
+   Converting a function from 1D to ND - apply_along_axis
   </a>
  </li>
  <li class="toctree-l1">
@@ -304,8 +309,8 @@
         
               <div>
                 
-  <div class="section" id="converting-a-function-from-1d-to-nd">
-<h1>Converting a function from 1D to ND<a class="headerlink" href="#converting-a-function-from-1d-to-nd" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="converting-a-function-from-1d-to-nd-apply-along-axis">
+<h1>Converting a function from 1D to ND - apply_along_axis<a class="headerlink" href="#converting-a-function-from-1d-to-nd-apply-along-axis" title="Permalink to this headline">¶</a></h1>
 <p>We have a function that works along the time axis, but only for 1D data. We’d like to convert it to work on a full dataset.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -340,7 +345,8 @@
 </div>
 <div class="section" id="nd-function">
 <h2>Nd function<a class="headerlink" href="#nd-function" title="Permalink to this headline">¶</a></h2>
-<p>To convert the 1d function to work on a nd dataset, use <a class="reference external" href="https://docs.dask.org/en/latest/array-api.html#dask.array.apply_along_axis"><code class="docutils literal notranslate"><span class="pre">dask.array.apply_along_axis</span></code></a> (a dask-array version of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.apply_along_axis.html"><code class="docutils literal notranslate"><span class="pre">numpy.apply_along_axis</span></code></a>). This will process the chunks in parallel</p>
+<p>In this case the function is calling numpy.correlate, which needs the whole time axis. The best way to parallelise a function is to re-write it to compute the whole grid at once, stepping over time. See the example <a class="reference internal" href="oned_to_nd_rewrite.html"><span class="doc">Converting a function from 1D to ND - slice method</span></a></p>
+<p>A more general way to convert the 1d function to work on a nd dataset is to use <a class="reference external" href="https://docs.dask.org/en/latest/array-api.html#dask.array.apply_along_axis"><code class="docutils literal notranslate"><span class="pre">dask.array.apply_along_axis</span></code></a> (a dask-array version of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.apply_along_axis.html"><code class="docutils literal notranslate"><span class="pre">numpy.apply_along_axis</span></code></a>). This will process the chunks in parallel, but will be a bit slower than the re-write method.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">edof</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
@@ -941,7 +947,7 @@ Wall time: 3min 59s
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="../dask-batch.html" title="previous page">Batch Scripts</a>
+    <a class='left-prev' id="prev-link" href="oned_to_nd_rewrite.html" title="previous page">Converting a function from 1D to ND - slice method</a>
     <a class='right-next' id="next-link" href="loading_ensemble.html" title="next page">Loading Ensemble Members</a>
 
         </div>
