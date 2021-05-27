@@ -51,7 +51,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Introduction" href="dask-intro.html" />
+    <link rel="next" title="Design Patterns" href="design-patterns.html" />
     <link rel="prev" title="Introduction" href="concepts-intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -101,6 +101,11 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Types of parallelism
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="design-patterns.html">
+   Design Patterns
   </a>
  </li>
 </ul>
@@ -326,40 +331,6 @@
    </li>
   </ul>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#design-patterns">
-   Design Patterns
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#halos">
-     Halos
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#queues">
-     Queues
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#common-gotchas">
-   Common Gotchas
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#race-conditions">
-     Race Conditions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#locks">
-     Locks
-    </a>
-   </li>
-  </ul>
- </li>
 </ul>
 
             </nav>
@@ -541,24 +512,6 @@ parallel --jobs <span class="nv">$PBS_NCPUS</span> ./hourly_to_daily.py ::: tas_
 </div>
 </div>
 </div>
-<div class="section" id="design-patterns">
-<h2>Design Patterns<a class="headerlink" href="#design-patterns" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="halos">
-<h3>Halos<a class="headerlink" href="#halos" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="queues">
-<h3>Queues<a class="headerlink" href="#queues" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
-<div class="section" id="common-gotchas">
-<h2>Common Gotchas<a class="headerlink" href="#common-gotchas" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="race-conditions">
-<h3>Race Conditions<a class="headerlink" href="#race-conditions" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="locks">
-<h3>Locks<a class="headerlink" href="#locks" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
 </div>
 
     <script type="text/x-thebe-config">
@@ -587,7 +540,7 @@ parallel --jobs <span class="nv">$PBS_NCPUS</span> ./hourly_to_daily.py ::: tas_
         <div class='prev-next-bottom'>
             
     <a class='left-prev' id="prev-link" href="concepts-intro.html" title="previous page">Introduction</a>
-    <a class='right-next' id="next-link" href="dask-intro.html" title="next page">Introduction</a>
+    <a class='right-next' id="next-link" href="design-patterns.html" title="next page">Design Patterns</a>
 
         </div>
         
