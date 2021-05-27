@@ -302,7 +302,7 @@
 <div class="section" id="halos">
 <h2>Halos<a class="headerlink" href="#halos" title="Permalink to this headline">¶</a></h2>
 <p>It’s common to break up a large dataset horizontally into a grid, with each part of the grid running on a different processor, especially in models.</p>
-<div class="cell tag_hide-inputs docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
@@ -345,7 +345,7 @@
 </div>
 <p>Each processor works on its own domain of the full grid, and since the vast majority of calculations done in a model are fairly local (the main exception is radiation) the individual processors don’t need to interact much. Where they do need to interact is at the edges of the domains, since to calcuate gradients and the like at the edges you need to know the field values on both sides of the boundary.</p>
 <p>This is normally accomplished by the actual grid held on each processor being a bit larger than the domain it works on, generally by a few grid points in each direction. This ‘halo’ around the domain gets read from neighbouring processors, e.g. with MPI messages. In a model the calculations are organised so that halo exchanges happen as few times as possible, since communication is generally relatively slow so should be avoided when possible.</p>
-<div class="cell tag_hide-inputs docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Rectangle</span>
 
