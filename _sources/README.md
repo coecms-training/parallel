@@ -6,6 +6,10 @@ This website contains collected notes on parallel programming in climate science
 
 We aim for the notebooks here to be executable using Binder (the rocket button in the top left of pages) using publically available data, however especially for large dataset demonstrations we may use files stored at [NCI](https://nci.org.au). Those with NCI accounts can start a Jupyter session on VDI or Gadi using the scripts at https://github.com/coecms/nci_scripts.
 
+## About Us
+
+CLEX CMS is a team providing data and computational support to researchers at the [ARC Centre of Excellence for Climate Extremes](https://climateextremes.org.au). We have a wiki at http://climate-cms.wikis.unsw.edu.au with more information
+
 ## Contributing
 
 The source code for this website is stored at https://github.com/coecms-training/parallel. It is produced using [Jupyter Book](https://jupyterbook.org/intro.html).
