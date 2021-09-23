@@ -1,21 +1,23 @@
-- file: README
-- part: Concepts
+format: jb-book
+root: README
+parts:
+- caption: Concepts
   chapters:
-    - file: concepts-intro
-    - file: concepts-types
-    - file: design-patterns
-- part: Dask
+  - file: concepts-intro
+  - file: concepts-types
+  - file: design-patterns
+- caption: Dask
   chapters:
-    - file: dask-intro
-    - file: dask-performance
-    - file: dask-troubleshooting
-    - file: case-studies/read_speed
-    - file: case-studies/strace_analysis
-    - file: dask-batch
-- part: Case Studies
+  - file: dask-intro
+  - file: dask-performance
+  - file: dask-troubleshooting
+  - file: case-studies/read_speed
+  - file: case-studies/strace_analysis
+  - file: dask-batch
+- caption: Case Studies
   chapters:
-    - file: case-studies/oned_to_nd_rewrite
-    - file: case-studies/oned_to_nd
-    - file: case-studies/loading_ensemble
-    - file: case-studies/climatology_multivar
-    - file: case-studies/regridding
+  - file: case-studies/oned_to_nd_rewrite
+  - file: case-studies/oned_to_nd
+  - file: case-studies/loading_ensemble
+  - file: case-studies/climatology_multivar
+  - file: case-studies/regridding
