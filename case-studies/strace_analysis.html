@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profiling Dask read performance &#8212; Parallel Programming in Climate and Weather</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Batch Scripts" href="../dask-batch.html" />
+    <link rel="prev" title="Measuring Performance" href="read_speed.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Parallel Programming in Climate and Weather</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Front Matter
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Concepts
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../concepts-intro.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../concepts-types.html">
+   Types of parallelism
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../design-patterns.html">
+   Design Patterns
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Dask
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-intro.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-performance.html">
+   Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-troubleshooting.html">
+   Pathological Behaviour and Troubleshooting
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="read_speed.html">
+   Measuring Performance
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Profiling Dask read performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../dask-batch.html">
+   Batch Scripts
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Case Studies
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="oned_to_nd_rewrite.html">
+   Converting a function from 1D to ND - slice method
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="oned_to_nd.html">
+   Converting a function from 1D to ND - apply_along_axis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="loading_ensemble.html">
+   Loading Ensemble Members
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="climatology_multivar.html">
+   Monthly Climatology of Many Variables
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="regridding.html">
+   Regridding with xesmf
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/case-studies/strace_analysis.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/coecms-training/parallel"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        
+        
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/coecms-training/parallel/master?urlpath=tree/case-studies/strace_analysis.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#filtering-and-looking-at-strace-output">
+   Filtering and looking at strace output
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#threads-and-processes-in-strace-output">
+     Threads and Processes in strace output
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-program-to-profile">
+   A program to profile
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reading-strace-output-in-python">
+   Reading strace output in Python
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#file-read-timelines">
+   File read timelines
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#four-threads">
+     Four Threads
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#four-processes">
+     Four Processes
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#read-speed-and-caching">
+   Read speed and caching
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conclusions">
+   Conclusions
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="profiling-dask-read-performance">
+<h1>Profiling Dask read performance<a class="headerlink" href="#profiling-dask-read-performance" title="Permalink to this headline">¶</a></h1>
+<p>Let’s take a look at the impact of threads vs processes on read speeds, using the ‘strace’ profile.</p>
+<p>‘strace’ is a command on linux that records system calls from the program to the operating system. System calls are how your program interacts with the filesystem, and include commands like <code class="docutils literal notranslate"><span class="pre">open()</span></code>, <code class="docutils literal notranslate"><span class="pre">read()</span></code>, <code class="docutils literal notranslate"><span class="pre">write()</span></code>, and <code class="docutils literal notranslate"><span class="pre">close()</span></code> along with many more.</p>
+<p>‘strace’ runs by wrapping around another program, just like ‘time’ does:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>strace python mean.py
+</pre></div>
+</div>
+<p>and outputs a list of all the system calls made to stderr:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2809601</span> <span class="mf">1632284156.604957523</span> <span class="n">openat</span><span class="p">(</span><span class="n">AT_FDCWD</span><span class="p">,</span> <span class="s2">&quot;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100101-20100131.nc&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="o">|</span><span class="n">O_CLOEXEC</span><span class="p">)</span> <span class="o">=</span> <span class="mi">55</span> <span class="o">&lt;</span><span class="mf">0.000377</span><span class="o">&gt;</span>
+<span class="mi">2809601</span> <span class="mf">1632284156.605830189</span> <span class="n">fstat</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mi">0660</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">969135808</span><span class="p">,</span> <span class="o">...</span><span class="p">})</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.000069</span><span class="o">&gt;</span>
+<span class="mi">2809601</span> <span class="mf">1632284156.606097458</span> <span class="n">ioctl</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="n">TCGETS</span><span class="p">,</span> <span class="mh">0x7ffdb53870f0</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="n">ENOTTY</span> <span class="p">(</span><span class="n">Inappropriate</span> <span class="n">ioctl</span> <span class="k">for</span> <span class="n">device</span><span class="p">)</span> <span class="o">&lt;</span><span class="mf">0.000014</span><span class="o">&gt;</span>
+<span class="mi">2809601</span> <span class="mf">1632284156.606929038</span> <span class="n">lseek</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SEEK_CUR</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.000021</span><span class="o">&gt;</span>
+<span class="mi">2809601</span> <span class="mf">1632284156.607167790</span> <span class="n">lseek</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SEEK_CUR</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.000019</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>in this way we can see when all of the file reads are happening, which rank (either process or thread) is doing the read, and how fast that read is.</p>
+<div class="section" id="filtering-and-looking-at-strace-output">
+<h2>Filtering and looking at strace output<a class="headerlink" href="#filtering-and-looking-at-strace-output" title="Permalink to this headline">¶</a></h2>
+<p>The base output of strace is overwhelming, and makes it hard to find the relevant system calls we’re interested in. It does however provide a good range of options for filtering the output so that it’s easier to see what’s happening.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>strace
+    --output trace <span class="c1"># save the trace to a file, rather than stderr</span>
+    --follow-forks <span class="c1"># trace any forks (i.e. processes and/or threads) created by the program as well</span>
+    -P <span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100101-20100131.nc&#39;</span> <span class="c1"># Only look at reads to these files</span>
+    -P <span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100201-20100228.nc&#39;</span>
+    --timestamps<span class="o">=</span>format:unix,precision:ns <span class="c1"># Record the time each system call was run at, in seconds</span>
+    --syscall-times <span class="c1"># Record how long the operating system took to run the system call</span>
+    python mean.py
+</pre></div>
+</div>
+<p>In the output, the majority of lines look something like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3637846</span> <span class="mf">1632202048.147773948</span> <span class="n">pread64</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;x^</span><span class="se">\0\5</span><span class="s2">@</span><span class="se">\372\277\375</span><span class="s2">!izT=</span><span class="se">\22\345\265</span><span class="s2">5</span><span class="se">\314</span><span class="s2">c</span><span class="se">\356</span><span class="s2">b</span><span class="se">\206\3\265\225</span><span class="s2">L</span><span class="se">\2\335\363\4\240</span><span class="s2">g&quot;</span><span class="o">...</span><span class="p">,</span> <span class="mi">2201358</span><span class="p">,</span> <span class="mi">450207942</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2201358</span> <span class="o">&lt;</span><span class="mf">0.000587</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The values are in order the process id doing the call, the time the call was run (in seconds since Jan 1 1970), the call and its arguments, the return value of the call, then in the angle brackets is the time taken to run the call in seconds.</p>
+<p>You can check what the arguments of the command are in its manpage, e.g. by running <code class="docutils literal notranslate"><span class="pre">man</span> <span class="pre">pread64</span></code>. This tells us that the arguments are ‘file descriptor’, ‘buffer’, ‘number of bytes to read’, ‘offset in file’, and the return value is the number of bytes that were read.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SYNOPSIS</span>
+        <span class="n">ssize_t</span> <span class="n">pread</span><span class="p">(</span><span class="nb">int</span> <span class="n">fd</span><span class="p">,</span> <span class="n">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">count</span><span class="p">,</span> <span class="n">off_t</span> <span class="n">offset</span><span class="p">);</span>
+
+<span class="n">DESCRIPTION</span>
+       <span class="n">pread</span><span class="p">()</span> <span class="n">reads</span> <span class="n">up</span> <span class="n">to</span> <span class="n">count</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="nn">file</span> <span class="n">descriptor</span> <span class="n">fd</span> <span class="n">at</span> <span class="n">offset</span> <span class="n">offset</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">the</span> <span class="n">start</span> <span class="n">of</span> <span class="n">the</span> <span class="n">file</span><span class="p">)</span> <span class="n">into</span> <span class="n">the</span> <span class="n">buffer</span> <span class="n">starting</span> <span class="n">at</span> <span class="n">buf</span><span class="o">.</span>  <span class="n">The</span> <span class="n">file</span> <span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">changed</span><span class="o">.</span>
+
+       <span class="n">The</span> <span class="n">file</span> <span class="n">referenced</span> <span class="n">by</span> <span class="n">fd</span> <span class="n">must</span> <span class="n">be</span> <span class="n">capable</span> <span class="n">of</span> <span class="n">seeking</span><span class="o">.</span>
+
+<span class="n">RETURN</span> <span class="n">VALUE</span>
+       <span class="n">On</span> <span class="n">success</span><span class="p">,</span> <span class="n">pread</span><span class="p">()</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="nb">bytes</span> <span class="n">read</span> <span class="p">(</span><span class="n">a</span> <span class="k">return</span> <span class="n">of</span> <span class="n">zero</span> <span class="n">indicates</span> <span class="n">end</span> <span class="n">of</span> <span class="n">file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So the strace line means that at timestamp 1632202048 the process with id 3637846 ran the <code class="docutils literal notranslate"><span class="pre">pread64</span></code> call, asking to read 2201358 bytes from file id 8. The full 2201358 bytes were read, and the read took 0.000587 seconds.</p>
+<div class="section" id="threads-and-processes-in-strace-output">
+<h3>Threads and Processes in strace output<a class="headerlink" href="#threads-and-processes-in-strace-output" title="Permalink to this headline">¶</a></h3>
+<p>In the strace output threads and processes work the same way, separate threads/processes always have different process ids (the first number in the output). I’ll generally refer to both threads and processes interchangably as ‘ranks’.</p>
+</div>
+</div>
+<div class="section" id="a-program-to-profile">
+<h2>A program to profile<a class="headerlink" href="#a-program-to-profile" title="Permalink to this headline">¶</a></h2>
+<p>I’ll start with a simple program, that just calculates the global mean of two months of era5 data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100101-20100131.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100201-20100228.nc&#39;</span><span class="p">]</span>
+
+<span class="n">das</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="s1">&#39;t2m&#39;</span><span class="p">]</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">encoding</span><span class="p">[</span><span class="s1">&#39;chunksizes&#39;</span><span class="p">]))</span>
+    <span class="n">chunks</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="n">das</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">das</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Rather than using <code class="docutils literal notranslate"><span class="pre">xarray.open_mfdataset</span></code> I’ve opened each file separately so the results are clearer to see. The NCI ERA5 files don’t all have the same internal chunking, so if you use <code class="docutils literal notranslate"><span class="pre">open_mfdataset</span></code> to give all the same chunks you’re not always reading one file chunk with one dask chunk.</p>
+<p>I’ve run this program on Gadi’s compute node with 4 CPUs, both using Dask’s default thread scheduler and a <code class="docutils literal notranslate"><span class="pre">dask.distributed.Client()</span></code> with 4 processors.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="reading-strace-output-in-python">
+<h2>Reading strace output in Python<a class="headerlink" href="#reading-strace-output-in-python" title="Permalink to this headline">¶</a></h2>
+<p>This function reads the output from strace and creates a Pandas DataFrame with the results.</p>
+<p>There are a couple extra complexities we need to deal with here. When running in parallel it’s possible for two or more ranks to be using a system call at the same time. In this case the output will have a line ending with <code class="docutils literal notranslate"><span class="pre">&lt;unfinished</span> <span class="pre">...&gt;</span></code> marking the start time when another rank runs a system call while this call is still running, then once the original call has finished it will get a line with <code class="docutils literal notranslate"><span class="pre">&lt;...</span> <span class="pre">resumed&gt;</span></code> marking the result and call duration.</p>
+<p>While threads and processes for the most part work the same in the strace output, there is one annoying difference. With threads, each rank’s file ids will be copied from the parent process. So if the parent process opens file ‘2t_era5_oper_sfc_20100101-20100131.nc’ as file id 8, then all of the threads will be using that same file id to read from that file. Processes on the other hand each open the file separately, so process 1 might open the file as file id 8, process 2 as file id 45 and so on.</p>
+<p>When looking at the profile results it’s nice to be able to see when the same file is being read by different ranks. At the end of the function is some cleanup to match up the file ids across all the different ranks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">re_signal</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;proc&gt;[0-9]+) (?P&lt;timestamp&gt;[0-9.]+) (\+\+\+|\-\-\-).*&#39;</span><span class="p">)</span>
+<span class="n">re_call</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;proc&gt;[0-9]+) (?P&lt;timestamp&gt;[0-9.]+) (?P&lt;call&gt;[A-Za-z0-9_]+)\((?P&lt;args&gt;.*)\)\s*= (?P&lt;ret&gt;-?[0-9]+) (?P&lt;errcode&gt;.*)?&lt;(?P&lt;cost&gt;[0-9.]+)&gt;&#39;</span><span class="p">)</span>
+<span class="n">re_call_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;proc&gt;[0-9]+) (?P&lt;timestamp&gt;[0-9.]+) (?P&lt;call&gt;[A-Za-z0-9_]+)\((?P&lt;args&gt;.*) &lt;unfinished ...&gt;&#39;</span><span class="p">)</span>
+<span class="n">re_call_end</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;proc&gt;[0-9]+) (?P&lt;timestamp&gt;[0-9.]+) &lt;... (?P&lt;call&gt;[A-Za-z0-9_]+) resumed&gt;(?P&lt;args&gt;.*)\)\s*= (?P&lt;ret&gt;-?[0-9]+) (?P&lt;errcode&gt;.*)?&lt;(?P&lt;cost&gt;[0-9.]+)&gt;&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">read_trace</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># A signal - ignore</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re_signal</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+                
+            <span class="c1"># A system call that is unfinished - save the important info to the &#39;state&#39; dict</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re_call_start</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">state</span><span class="p">[</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;call&#39;</span><span class="p">],</span> <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]}</span>
+                <span class="k">continue</span>
+                
+            <span class="c1"># End of an unfinished call - get the start time from the &#39;state&#39; dict and add to &#39;result&#39;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re_call_end</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]]</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+                
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+                
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]),</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;call&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]),</span> <span class="n">file</span><span class="p">,</span> <span class="n">args</span><span class="p">])</span>
+                <span class="k">continue</span>
+                
+            <span class="c1"># A normal call - add the result to the &#39;result&#39; array</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re_call</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+                    
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]),</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;call&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]),</span> <span class="n">file</span><span class="p">,</span> <span class="n">args</span><span class="p">])</span>
+                <span class="k">continue</span>
+            
+            <span class="c1"># Print out any unmatched lines</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            
+    <span class="c1"># Convert to a dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">,</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="s1">&#39;call&#39;</span><span class="p">,</span><span class="s1">&#39;cost&#39;</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># Work out what files were opened</span>
+    <span class="n">fnames</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">call</span> <span class="o">==</span> <span class="s1">&#39;openat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">unique</span><span class="p">())}</span>
+
+    <span class="c1"># Mapping from the FILE values on each processor to consistent file ids</span>
+    <span class="n">proc_file_ids</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">proc</span><span class="p">,</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">call</span> <span class="o">==</span> <span class="s1">&#39;openat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;proc&#39;</span><span class="p">):</span>
+        <span class="n">proc_file_ids</span><span class="p">[</span><span class="n">proc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dd</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">ret</span><span class="p">,</span> <span class="n">fnames</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">args</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;file_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">proc_file_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">proc</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="n">proc_file_ids</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="file-read-timelines">
+<h2>File read timelines<a class="headerlink" href="#file-read-timelines" title="Permalink to this headline">¶</a></h2>
+<p>As a starting point let’s make a timeline plot, where the x axis is time and the y axis is different ranks, showing what each rank is doing as the program runs.</p>
+<p>I’ll show only read calls, when there is a box present then a file read is happening. Box colour indicates what file is being read.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_timeline</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+    
+    <span class="c1"># Set the time origin to the start of the program</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="c1"># Convert the process ids to consecutive numbers for the y axis</span>
+    <span class="n">proc_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">unique</span><span class="p">())}</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;proc_id&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">df</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">proc_map</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+    
+    <span class="c1"># Filter to only the read calls</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">call</span> <span class="o">==</span> <span class="s1">&#39;pread64&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Setup colours</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;plasma&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">file_id</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">file_id</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+    <span class="c1"># Make a &#39;broken_barh&#39; plot for each rank</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">proc</span><span class="p">,</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;proc_id&#39;</span><span class="p">):</span>
+        <span class="n">xranges</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">cost</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">dd</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">dd</span><span class="o">.</span><span class="n">file_id</span><span class="p">))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">broken_barh</span><span class="p">(</span><span class="n">xranges</span><span class="p">,</span> <span class="p">[</span><span class="n">proc</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="four-threads">
+<h3>Four Threads<a class="headerlink" href="#four-threads" title="Permalink to this headline">¶</a></h3>
+<p>Looking at the file access when the default thread scheduler is being used you can clearly see a diagonal pattern. Each thread gets its turn to read from a file for around 0.2 seconds, then the next thread gets its turn.</p>
+<p>Only one thread at a time can read from a netCDF file, regardless of what file it is. You never see the blue and yellow files being read at the same time.</p>
+<p>This may or may not be a problem - if you’ve got a simple computation then the other threads are doing nothing while one thread is reading from a file, but for more complex tasks then the other threads will be doing work while waiting for their turn to read.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_timeline</span><span class="p">(</span><span class="s1">&#39;trace.2files.4procs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/strace_analysis_7_0.png" src="../_images/strace_analysis_7_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="four-processes">
+<h3>Four Processes<a class="headerlink" href="#four-processes" title="Permalink to this headline">¶</a></h3>
+<p>Processes on the other hand is much more mixed up. Different processes can read at the same time, whether or not the read is from the same file. We’re only looking at the first 20 seconds of the run here, but the total run ends up taking about 25 seconds rather than nearly 60 seconds for the threaded read.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_timeline</span><span class="p">(</span><span class="s1">&#39;trace_dist.2files.4procs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/strace_analysis_9_0.png" src="../_images/strace_analysis_9_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="read-speed-and-caching">
+<h2>Read speed and caching<a class="headerlink" href="#read-speed-and-caching" title="Permalink to this headline">¶</a></h2>
+<p>Let’s take a look at how fast the disk is performing, by plotting the IO speed of each read. The plot is now showing read speed in bytes per second on the y axis, with the values coloured by rank.</p>
+<p>For the test with processes, the speed is fairly consistent, with a mean speed of about 50 MB/second</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_readspeed_by_process</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="nb">max</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+    
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">t0</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">call</span> <span class="o">==</span> <span class="s1">&#39;pread64&#39;</span><span class="p">]</span>
+
+    <span class="n">proc_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">unique</span><span class="p">())}</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">proc_map</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">proc</span><span class="o">.</span><span class="n">max</span><span class="p">())(</span><span class="n">proc</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">ret</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">cost</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;read speed&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;runtime (s)&#39;</span><span class="p">)</span>
+    
+    <span class="n">ticks</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">max</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">parse_bytes</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1"> MB&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ticks</span><span class="p">],</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1"> MB/s&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ticks</span><span class="p">])</span>
+    <span class="n">loc</span><span class="p">,</span><span class="n">label</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">loc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean speed </span><span class="si">{</span><span class="n">dask</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">format_bytes</span><span class="p">((</span><span class="n">d</span><span class="o">.</span><span class="n">ret</span><span class="o">/</span><span class="n">d</span><span class="o">.</span><span class="n">cost</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">}</span><span class="s2">/s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_readspeed_by_process</span><span class="p">(</span><span class="s1">&#39;trace_dist.2files.4procs&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean speed 51.76 MiB/s
+</pre></div>
+</div>
+<img alt="../_images/strace_analysis_12_1.png" src="../_images/strace_analysis_12_1.png" />
+</div>
+</div>
+<p>Below is a second run, that starts off the same as the previous run but then the read speed jumps massively, with a mean read speed of 1.65 GB/s. It’s reading exactly the same data, all that’s happened is the value is calculated again a second time after the first calculation is complete.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100101-20100131.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100201-20100228.nc&#39;</span><span class="p">]</span>
+
+<span class="n">das</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="s1">&#39;t2m&#39;</span><span class="p">]</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">encoding</span><span class="p">[</span><span class="s1">&#39;chunksizes&#39;</span><span class="p">]))</span>
+    <span class="n">chunks</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="n">das</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">das</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This shows the massive effect that caching can have on IO performance. If you re-read data that you’ve recently read from a file, it’s going to be much faster the second time round. The operating system keeps data that was recently read in a in-memory cache so that it doesn’t need to go back to the hard disk, which is much slower.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_readspeed_by_process</span><span class="p">(</span><span class="s1">&#39;trace_dist_x2.2files.4procs&#39;</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean speed 1.65 GiB/s
+</pre></div>
+</div>
+<img alt="../_images/strace_analysis_14_1.png" src="../_images/strace_analysis_14_1.png" />
+</div>
+</div>
+<p>This is also why I didn’t use open_mfdataset for this demonstration- if the chunks for all files don’t line up with the dask chuning then some data gets read from cache, messing up profile measurements</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100101-20100131.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;/g/data/rt52/era5/single-levels/reanalysis/2t/2010/2t_era5_oper_sfc_20100201-20100228.nc&#39;</span><span class="p">]</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="mi">180</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_readspeed_by_process</span><span class="p">(</span><span class="s1">&#39;trace_dist_mf.2files.4procs&#39;</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean speed 1.88 GiB/s
+</pre></div>
+</div>
+<img alt="../_images/strace_analysis_16_1.png" src="../_images/strace_analysis_16_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="conclusions">
+<h2>Conclusions<a class="headerlink" href="#conclusions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>In general, prefer using processes (i.e. dask.distributed.Client) to threads when reading NetCDF files with xarray+dask</p></li>
+<li><p>Be careful of the effects of disk caching when profiling - reading data a second time is much faster than the first time it’s read</p></li>
+<li><p>The strace tool can give useful insights into how IO is happening within a program</p></li>
+</ul>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-analysis3-21.07-py"
+        },
+        kernelOptions: {
+            kernelName: "conda-env-analysis3-21.07-py",
+            path: "./case-studies"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-analysis3-21.07-py'</script>
+
+              </div>
+              
+        
+            
+
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="read_speed.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title">Measuring Performance</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="../dask-batch.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title">Batch Scripts</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
+        
+        </div>
+    </div>
+    <footer class="footer">
+    <div class="container">
+      <p>
+        
+          By CLEX CMS<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
