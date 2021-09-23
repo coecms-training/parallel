@@ -3,6 +3,7 @@
   chapters:
     - file: concepts-intro
     - file: concepts-types
+    - file: design-patterns
 - part: Dask
   chapters:
     - file: dask-intro
@@ -10,8 +11,11 @@
     - file: dask-troubleshooting
     - file: case-studies/read_speed
     - file: case-studies/strace_analysis
+    - file: dask-batch
 - part: Case Studies
   chapters:
+    - file: case-studies/oned_to_nd_rewrite
     - file: case-studies/oned_to_nd
     - file: case-studies/loading_ensemble
     - file: case-studies/climatology_multivar
+    - file: case-studies/regridding
