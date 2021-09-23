@@ -9,6 +9,7 @@
     - file: dask-performance
     - file: dask-troubleshooting
     - file: case-studies/read_speed
+    - file: case-studies/strace_analysis
 - part: Case Studies
   chapters:
     - file: case-studies/oned_to_nd
